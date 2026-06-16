@@ -363,7 +363,596 @@
         const EXCLUSIVE_IDIOM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
         
         // 🔒 總目錄管理線路
-        const MASTER_INDEX_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
+        const MASTER_INDEX_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwcq7RkVq_FVU4iYHMLTFQW_DIRkqgaSsp1dEkEp0zYxz-saj00T-IM2Km8WbT41oFrzkUUXMqQp-j/pub?output=csv";
+
+        let currentCourseKey = "none_selected";
+        let originalCards = [];
+        let queue = [];
+        let currentCard = null;
+        let isFlipped = false;
+        
+        const synth = window.speechSynthesis;
+
+        const learningStage = document.getElementById('learning-stage');
+        const completionScreen = document.getElementById('completion-screen');
+        const flashcard = document.getElementById('flashcard');
+        const controls = document.getElementById('controls');
+        const progressBar = document.getElementById('progress-bar');
+        const counter = document.getElementById('counter');
+
+        // 🚪 點擊關閉首頁遮罩書，正式啟動選單與讀取
+        function closeManualOverlay() {
+            document.getElementById('manual-overlay').style.display = 'none';
+            autoFetchDirectory(); 
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function fixGoogleSpreadsheetUrl(url) {
+            let clean = url.trim();
+            if (clean.includes("docs.google.com/spreadsheets") && !clean.includes("output=csv") && !clean.includes("format=csv")) {
+                if (clean.includes("/edit")) {
+                    clean = clean.split('/edit')[0] + "/export?format=csv";
+                } else if (clean.endsWith("/")) {
+                    clean = clean + "export?format=csv";
+                } else if (!clean.includes("/export")) {
+                    clean = clean + "/export?format=csv";
+                }
+            }
+            return clean;
+        }
+
+        function autoFetchDirectory() {
+            fetch(MASTER_INDEX_URL)
+                .then(res => res.text())
+                .then(text => {
+                    const lines = text.replace(/\r/g, '').split('\n');
+                    const dropdown = document.getElementById('course-dropdown');
+                    dropdown.innerHTML = '';
+                    
+                    // 預設核心成語課本置頂
+                    const defOpt = document.createElement('option');
+                    defOpt.value = EXCLUSIVE_IDIOM_URL;
+                    defOpt.textContent = "★ 預設課程：A02 古典思維成語繪本";
+                    dropdown.appendChild(defOpt);
+                    
+                    for(let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim(); if(!line) continue;
+                        const parts = parseCSVLine(line);
+                        if(parts.length >= 2) {
+                            const csvUrl = fixGoogleSpreadsheetUrl(parts[1].trim());
+                            if(csvUrl === EXCLUSIVE_IDIOM_URL) continue; 
+                            const option = document.createElement('option');
+                            option.value = csvUrl; 
+                            option.textContent = parts[0].trim(); 
+                            dropdown.appendChild(option);
+                        }
+                    }
+                    
+                    // 恢復快取記憶
+                    const lastCourse = localStorage.getItem('idiom_final_cache_key');
+                    if(lastCourse && dropdown.querySelector(`option[value="${lastCourse}"]`)) {
+                        dropdown.value = lastCourse;
+                        currentCourseKey = lastCourse;
+                    } else {
+                        dropdown.value = EXCLUSIVE_IDIOM_URL;
+                        currentCourseKey = EXCLUSIVE_IDIOM_URL;
+                    }
+
+                    initEngineWithCache(currentCourseKey);
+                })
+                .catch(err => {
+                    initEngineWithCache(EXCLUSIVE_IDIOM_URL);
+                });
+        }
+
+        function handleCourseSwitch(value) {
+            currentCourseKey = value;
+            localStorage.setItem('idiom_final_cache_key', value);
+            initEngineWithCache(value);
+        }
+
+        function initEngineWithCache(url) {
+            fetch(url)
+                .then(res => res.text())
+                .then(text => {
+                    const cards = parseCourseCSV(text);
+                    
+                    // 🔒 獨立隔離金鑰，完全杜絕對接交叉污染
+                    const storageSuffix = btoa(url).substring(0,20);
+                    const cacheKey_queue = `idiom_final_q_${storageSuffix}`;
+                    const cacheKey_orig = `idiom_final_o_${storageSuffix}`;
+                    const cachedQueue = localStorage.getItem(cacheKey_queue);
+                    const cachedOriginal = localStorage.getItem(cacheKey_orig);
+                    
+                    if (cachedQueue && cachedOriginal) {
+                        queue = JSON.parse(cachedQueue);
+                        originalCards = JSON.parse(cachedOriginal);
+                    } else {
+                        originalCards = [...cards];
+                        let activeCards = cards.filter(c => c.historyCount !== 99);
+                        queue = shuffleArray(activeCards); // 🎲 完全隨機洗牌
+                    }
+                    updateProgress();
+                    showNextCard();
+                });
+        }
+
+        function showNextCard() {
+            if (queue.length === 0) { showCompletion(); return; }
+            isFlipped = false; flashcard.classList.remove('flipped'); controls.classList.remove('visible');
+            currentCard = queue[0];
+
+            document.getElementById('front-word').textContent = currentCard.word;
+            document.getElementById('back-word').textContent = currentCard.word;
+            
+            // 🔒 100% 精密映射：對齊你的後端資料流（B 欄一句話核心、G 欄故事、H 欄悄悄話）
+            document.getElementById('back-translation').innerHTML = currentCard.type ? `<strong>核心引子：</strong>${currentCard.type}` : '';
+            document.getElementById('back-phr').innerHTML = `<span style="color:var(--accent-master); font-weight:600;">${currentCard.translation || '#標籤'}</span><br><br>${currentCard.phr || '-'}`; 
+            document.getElementById('back-example-en').textContent = currentCard.example_en;
+            
+            document.getElementById('card-image').style.backgroundImage = `url('./${currentCard.word.toLowerCase()}.jpg')`;
+            document.querySelector('.card-back-content').scrollTop = 0;
+        }
+
+        function flipCard() {
+            if (document.getElementById('manual-overlay').style.display !== 'none') return;
+            if (isFlipped || !currentCard) return;
+            isFlipped = true; flashcard.classList.add('flipped'); controls.classList.add('visible');
+            speakCard();
+        }
+
+        function speakCard() {
+            try {
+                synth.cancel(); 
+                const utterWord = new SpeechSynthesisUtterance(currentCard.word); 
+                utterWord.lang = "zh-TW"; 
+                synth.speak(utterWord); 
+            } catch(e) {}
+        }
+
+        function replayAudio() {
+            speakCard();
+        }
+
+        function handleSRS(level) {
+            if (!isFlipped) return;
+            const card = queue.shift(); 
+            if (level === 'again') { queue.push(card); } 
+            else if (level === 'easy') {
+                const master = originalCards.find(c => c.word === card.word);
+                if(master) master.historyCount = 99; 
+            }
+            
+            const suffix = btoa(currentCourseKey).substring(0,20);
+            localStorage.setItem(`idiom_final_q_${suffix}`, JSON.stringify(queue));
+            localStorage.setItem(`idiom_final_o_${suffix}`, JSON.stringify(originalCards));
+            updateProgress(); showNextCard();
+        }
+
+        function parseCourseCSV(text) {
+            const lines = text.replace(/\r/g, '').split('\n');
+            let importedData = [];
+            for (let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim(); if (!line) continue;
+                let row = parseCSVLine(line);
+                if (row.length >= 8) {
+                    importedData.push({
+                        word:         row[0] ? row[0].trim() : '', // 成語本體 (A)
+                        type:         row[1] ? row[1].trim() : '', // 一句話核心 (B)
+                        level:        row[2] ? row[2].trim() : '', // 繪本標籤 (C)
+                        translation:  row[3] ? row[3].trim() : '', // #搜尋關鍵字 (D)
+                        inflection:   row[4] ? row[4].trim() : '', 
+                        collocation:  row[5] ? row[5].trim() : '', 
+                        phr:          row[6] ? row[6].replace(/\\n/g, '\n') : '', // 故事這樣講 (G)
+                        example_en:   row[7] ? row[7].replace(/\\n/g, '\n') : '', // 給小寶貝的悄悄話 (H)
+                        example_ch:   row[8] ? row[8].trim() : '', 
+                        historyCount: row[9] ? parseFloat(row[9]) : 0
+                    });
+                }
+            }
+            return importedData;
+        }
+
+        function parseCSVLine(line) {
+            let row = [], inQuotes = false, currentField = '';
+            for (let j = 0; j < line.length; j++) {
+                let char = line[j];
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) { row.push(currentField.trim()); currentField = ''; }
+                else currentField += char;
+            }
+            row.push(currentField.trim());
+            return row.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
+        }
+
+        function updateProgress() {
+            const total = originalCards.length; const currentLeft = queue.length;
+            progressBar.style.width = `${total > 0 ? ((total - currentLeft) / total) * 100 : 0}%`;
+            counter.textContent = `${currentLeft} / ${total}`;
+        }
+        function showCompletion() { learningStage.classList.add('hidden'); completionScreen.classList.remove('hidden'); }
+        function resetEngine() { 
+            const suffix = btoa(currentCourseKey).substring(0,20);
+            localStorage.removeItem(`idiom_final_q_${suffix}`);
+            localStorage.removeItem(`idiom_final_o_${suffix}`);
+            initEngineWithCache(currentCourseKey); 
+        }
+        function clearCurrentCourseProgress() { if(confirm("確定歸零清除當前成語課程的內化進度？")) { const suffix = btoa(currentCourseKey).substring(0,20); localStorage.removeItem(`idiom_final_q_${suffix}`); localStorage.removeItem(`idiom_final_o_${suffix}`); initEngineWithCache(currentCourseKey); } }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 古典思維永久宮殿 — 深度觀察者</title>
+    <style>
+        :root {
+            --bg-color: #0c0c0c;
+            --card-bg: #141414;
+            --text-main: #e0e0e0;
+            --text-sub: #9e9e9e;
+            --accent-think: #ffb74d;   /* 古卷黃 */
+            --accent-master: #26a69a;  /* 竹青綠 */
+            --accent-highlight: #4db6ac;
+            --border-color: #242424;
+            --score-bg: #111111;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            align-items: center;
+            overflow: hidden;
+            padding: 10px 12px 20px 12px; 
+        }
+
+        /* 🚪 核心復位：一進去首頁的古典操作說明書遮罩層 */
+        #manual-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(10, 10, 10, 0.98);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .manual-container {
+            background: #141414;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            max-width: 580px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            padding: 30px 24px;
+            justify-content: space-between;
+        }
+        .cover-img-box { width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 12px; background: #000; border: 1px solid #222; }
+        .cover-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .cover-logic-box { text-align: left; width: 100%; padding-top: 20px; flex-grow: 1; }
+        .cover-title { font-size: 1.4rem; color: #fff; font-weight: bold; margin-bottom: 12px; border-left: 3px solid var(--accent-think); padding-left: 10px; letter-spacing: 1px; }
+        .cover-desc { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; text-align: justify; }
+        .cover-btn { background: #1c1c1c; border: 1px solid var(--accent-think); color: var(--accent-think); padding: 12px 24px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: all 0.2s ease; width: 100%; text-align: center; letter-spacing: 2px; outline: none; }
+        .cover-btn:hover { background: var(--accent-think); color: #000; box-shadow: 0 0 15px rgba(255, 183, 77, 0.3); }
+
+        /* 🌐 頂部課程切換控制區 */
+        .directory-zone {
+            width: 100%;
+            max-width: 620px;
+            background: #111;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .course-select {
+            flex: 1;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            color: var(--accent-think);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        header {
+            width: 100%;
+            max-width: 620px;
+            padding: 4px 4px 8px 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            flex-shrink: 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            max-width: 220px; 
+            background: #222;
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-right: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-think), var(--accent-master));
+            transition: width 0.3s ease;
+        }
+
+        .counter { font-size: 0.8rem; color: var(--text-sub); min-width: 50px; }
+        .btn-group { display: flex; gap: 6px; align-items: center; }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover { color: var(--text-main); border-color: var(--text-sub); }
+
+        /* 專屬雙軌控制鈕 */
+        .controls { 
+            display: flex; 
+            gap: 10px; 
+            opacity: 0; 
+            visibility: hidden;
+            height: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            width: 100%; 
+            max-width: 620px; 
+            flex-shrink: 0;
+        }
+        .controls.visible { 
+            opacity: 1; 
+            visibility: visible;
+            height: 48px;
+            transform: translateY(0);
+            margin-top: 6px;
+            margin-bottom: 10px;
+        }
+
+        .btn { 
+            flex: 1; 
+            background: #161616; 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-main); 
+            font-weight: 500; 
+            font-size: 0.9rem; 
+            gap: 6px;
+            transition: all 0.2s ease; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        .btn-again:hover { border-color: var(--accent-think); color: var(--accent-think); background: #1a1510; }
+        .btn-easy:hover { border-color: var(--accent-master); color: var(--accent-master); background: #101a18; }
+
+        /* 卡片大舞台 */
+        .stage { 
+            perspective: 1000px; 
+            width: 100%; 
+            max-width: 620px; 
+            flex-grow: 1;
+            cursor: pointer; 
+            margin-top: 4px;
+        }
+
+        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
+
+        /* 正面 */
+        .card-front { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
+        .card-front .idiom-title { font-size: 3.2rem; font-weight: 700; letter-spacing: 4px; text-align: center; color: #ffffff; text-shadow: 0 2px 10px rgba(255,255,255,0.05); }
+        .card-front .hint { position: absolute; bottom: 30px; font-size: 0.8rem; color: var(--text-sub); letter-spacing: 2px; }
+
+        /* 繪本插圖區 */
+        .card-image-bg { 
+            width: 100% !important; 
+            height: 35%; 
+            min-height: 140px;
+            opacity: 1.0; 
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            pointer-events: none; 
+            background-color: #050505; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0; 
+        }
+
+        /* 背面大空間排版 */
+        .card-back { transform: rotateY(180deg); display: flex !important; flex-direction: column !important; justify-content: flex-start; align-items: center; padding: 0 !important; }
+        
+        .card-back-content { 
+            position: relative;
+            width: 100%; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            padding: 20px 22px; 
+            text-align: left; 
+            overflow-y: auto; 
+        }
+
+        .back-idiom-header { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 4px; 
+            border-bottom: 1px solid #222; 
+            padding-bottom: 8px; 
+            padding-right: 115px;
+            width: 100%;
+        }
+        .back-idiom-title { font-size: 2rem; font-weight: 700; color: #ffffff; letter-spacing: 1px; word-break: break-all; }
+        
+        /* 🔊 靠右鎖定發音鍵 */
+        .back-speaker-position {
+            position: absolute;
+            top: 20px;      
+            right: 22px;    
+            z-index: 99;    
+        }
+
+        .card-speaker-btn {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            color: var(--accent-master);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            white-space: nowrap; 
+            flex-shrink: 0;       
+        }
+        .card-speaker-btn:hover { background: #222; border-color: var(--accent-master); }
+        
+        .back-definition { font-size: 1.0rem; margin-bottom: 12px; color: var(--accent-think); font-weight: 500; line-height: 1.5; padding-right: 115px; text-align: justify; }
+
+        .section-title { font-size: 0.8rem; color: var(--accent-highlight); margin-top: 10px; margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
+        .section-text { font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px; line-height: 1.6; text-align: justify; white-space: pre-line; }
+
+        .example-header { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+        .example-block { margin-top: 4px; border-left: 2px solid var(--accent-master); padding-left: 12px; width: 100%; background: #111; padding: 12px; border-radius: 0 8px 8px 0; }
+        .example-en { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; }
+    </style>
+</head>
+<body>
+
+    <div id="manual-overlay">
+        <div class="manual-container">
+            <div class="cover-img-box">
+                <img src="https://r2.uploads.tw/2026/06/KQxnJG4NAw.webp" alt="黑盒子頻道主視覺封面">
+            </div>
+            <div class="cover-logic-box">
+                <div class="cover-title">古典思維成語繪本宮殿</div>
+                <div class="cover-desc">
+                    成語，是華夏文明淬煉千年的思想膠囊。<br><br>
+                    本繪本宮殿嚴格根據正統歷史文獻考據，拒絕胡編。我們將深奧的文言文記載，全面轉譯為具備強烈畫面感、生動且適合 4-10 歲孩童在 30-45 秒內聽懂的【故事這樣講】。並透過【給小寶貝的悄悄話】，將古典智慧無痛對齊孩子的現代生活與品格導向。
+                </div>
+            </div>
+            <button class="cover-btn" onclick="closeManualOverlay()">推開古典智慧大門 ➔</button>
+        </div>
+    </div>
+
+    <div class="directory-zone">
+        <span style="font-size:0.85rem; color:var(--text-sub); white-space:nowrap; font-weight:bold;">📜 當前課程目錄：</span>
+        <select id="course-dropdown" class="course-select" onchange="handleCourseSwitch(this.value)">
+            <option value="none_selected">🔍 正在同步雲端目錄...</option>
+        </select>
+    </div>
+
+    <header>
+        <div style="display: flex; align-items: center; flex-grow: 1;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <span class="counter" id="counter">0 / 0</span>
+        </div>
+        <div class="btn-group">
+            <button class="action-btn" onclick="exportCurrentCourseProgress()">導出進度</button>
+            <button class="action-btn" onclick="clearCurrentCourseProgress()" style="color:#ff5252;">清除進度</button>
+        </div>
+    </header>
+
+    <div id="learning-stage" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: calc(100vh - 150px); justify-content: flex-start;">
+        
+        <div class="controls" id="controls">
+            <button class="btn btn-again" onclick="handleSRS('again')">🔄 稍後再思索</button>
+            <button class="btn btn-easy" onclick="handleSRS('easy')">👁️‍🗨️ 已融會貫通 (內化)</button>
+        </div>
+
+        <div class="stage" id="card-stage" onclick="flipCard()">
+            <div class="card" id="flashcard">
+                <div class="card-face card-front">
+                    <div class="idiom-title" id="front-word">請先由上方選取課程</div>
+                    <div class="hint">點擊卡片解構典故</div>
+                </div>
+
+                <div class="card-face card-back">
+                    <div class="card-image-bg" id="card-image"></div>
+                    <div class="card-back-content" onclick="event.stopPropagation();">
+                        
+                        <div class="back-idiom-header">
+                            <span class="back-idiom-title" id="back-word">-</span>
+                        </div>
+                        
+                        <button class="card-speaker-btn back-speaker-position" onclick="replayAudio();">🔊 重聽發音</button>
+                        
+                        <div class="back-definition" id="back-translation">-</div>
+                        
+                        <div class="section-title">【故事這樣講】</div>
+                        <div class="section-text" id="back-phr">-</div>
+                        
+                        <div class="example-header">
+                            <div class="section-title" style="color:var(--accent-master);">【給小寶貝的悄悄話】</div>
+                        </div>
+                        <div class="example-block">
+                            <div class="example-en" id="back-example-en">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="completion-screen" class="message-screen hidden">
+        <h2>智慧沉澱，皆成階梯</h2>
+        <p>當前成語字卡庫已全數內化完成。</p>
+        <button class="file-upload-btn" onclick="resetEngine()">重新思索</button>
+    </div>
+
+    <script>
+        // 🔒 預設首課核心數據：你的成語試算表網址
+        const EXCLUSIVE_IDIOM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
+        
+        // 🔒 總目錄管理線路
+        const MASTER_INDEX_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwcq7RkVq_FVU4iYHMLTFQW_DIRkqgaSsp1dEkEp0zYxz-saj00T-IM2Km8WbT41oFrzkUUXMqQp-j/pub?output=csv";
 
         let currentCourseKey = "none_selected";
         let originalCards = [];
