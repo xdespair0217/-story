@@ -3,1177 +3,637 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 古典思維永久 — 深度觀察者</title>
+    <title>古典思維成語繪本 - 智慧宮殿字卡系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        :root {
-            --bg-color: #0c0c0c;
-            --card-bg: #141414;
-            --text-main: #e0e0e0;
-            --text-sub: #9e9e9e;
-            --accent-think: #ffb74d;   /* 古卷黃 */
-            --accent-master: #26a69a;  /* 竹青綠 */
-            --accent-highlight: #4db6ac;
-            --border-color: #242424;
-            --score-bg: #111111;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; 
-            align-items: center;
-            overflow: hidden;
-            padding: 10px 12px 20px 12px; 
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #0c0c0e;
+            color: #e4e4e7;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(217, 119, 6, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(13, 148, 136, 0.05) 0%, transparent 40%);
         }
-
-        /* 🚪 核心復位：一進去首頁的古典操作說明書遮罩層 */
-        #manual-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(10, 10, 10, 0.98);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .manual-container {
-            background: #141414;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            max-width: 580px;
-            width: 100%;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            padding: 30px 24px;
-            justify-content: space-between;
-        }
-        .cover-img-box { width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 12px; background: #000; border: 1px solid #222; }
-        .cover-img-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .cover-logic-box { text-align: left; width: 100%; padding-top: 20px; flex-grow: 1; }
-        .cover-title { font-size: 1.4rem; color: #fff; font-weight: bold; margin-bottom: 12px; border-left: 3px solid var(--accent-think); padding-left: 10px; letter-spacing: 1px; }
-        .cover-desc { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; text-align: justify; }
-        .cover-btn { background: #1c1c1c; border: 1px solid var(--accent-think); color: var(--accent-think); padding: 12px 24px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: all 0.2s ease; width: 100%; text-align: center; letter-spacing: 2px; outline: none; }
-        .cover-btn:hover { background: var(--accent-think); color: #000; box-shadow: 0 0 15px rgba(255, 183, 77, 0.3); }
-
-        /* 🌐 頂部課程切換控制區 */
-        .directory-zone {
-            width: 100%;
-            max-width: 620px;
-            background: #111;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        .course-select {
-            flex: 1;
-            background: #1c1c1c;
-            border: 1px solid #333;
-            color: var(--accent-think);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
-        }
-
-        header {
-            width: 100%;
-            max-width: 620px;
-            padding: 4px 4px 8px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            flex-shrink: 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .progress-container {
-            flex-grow: 1;
-            max-width: 220px; 
-            background: #222;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-right: 12px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent-think), var(--accent-master));
-            transition: width 0.3s ease;
-        }
-
-        .counter { font-size: 0.8rem; color: var(--text-sub); min-width: 50px; }
-        .btn-group { display: flex; gap: 6px; align-items: center; }
-
-        .action-btn {
-            background: transparent;
-            border: 1px solid #333;
-            color: var(--text-sub);
-            padding: 4px 10px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: all 0.2s ease;
-        }
-        .action-btn:hover { color: var(--text-main); border-color: var(--text-sub); }
-
-        /* 專屬雙軌控制鈕 */
-        .controls { 
-            display: flex; 
-            gap: 10px; 
-            opacity: 0; 
-            visibility: hidden;
-            height: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
-            width: 100%; 
-            max-width: 620px; 
-            flex-shrink: 0;
-        }
-        .controls.visible { 
-            opacity: 1; 
-            visibility: visible;
-            height: 48px;
-            transform: translateY(0);
-            margin-top: 6px;
-            margin-bottom: 10px;
-        }
-
-        .btn { 
-            flex: 1; 
-            background: #161616; 
-            border: 1px solid var(--border-color); 
-            padding: 10px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: var(--text-main); 
-            font-weight: 500; 
-            font-size: 0.9rem; 
-            gap: 6px;
-            transition: all 0.2s ease; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        .btn-again:hover { border-color: var(--accent-think); color: var(--accent-think); background: #1a1510; }
-        .btn-easy:hover { border-color: var(--accent-master); color: var(--accent-master); background: #101a18; }
-
-        /* 卡片大舞台 */
-        .stage { 
-            perspective: 1000px; 
-            width: 100%; 
-            max-width: 620px; 
-            flex-grow: 1;
-            cursor: pointer; 
-            margin-top: 4px;
-        }
-
-        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
-
-        /* 正面 */
-        .card-front { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
-        .card-front .idiom-title { font-size: 3.2rem; font-weight: 700; letter-spacing: 4px; text-align: center; color: #ffffff; text-shadow: 0 2px 10px rgba(255,255,255,0.05); }
-        .card-front .hint { position: absolute; bottom: 30px; font-size: 0.8rem; color: var(--text-sub); letter-spacing: 2px; }
-
-        /* 繪本插圖區 */
-        .card-image-bg { 
-            width: 100% !important; 
-            height: 35%; 
-            min-height: 140px;
-            opacity: 1.0; 
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            background-position: center; 
-            pointer-events: none; 
-            background-color: #050505; 
-            border-bottom: 1px solid var(--border-color); 
-            flex-shrink: 0; 
-        }
-
-        /* 背面大空間排版 */
-        .card-back { transform: rotateY(180deg); display: flex !important; flex-direction: column !important; justify-content: flex-start; align-items: center; padding: 0 !important; }
-        
-        .card-back-content { 
-            position: relative;
-            width: 100%; 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start; 
-            padding: 20px 22px; 
-            text-align: left; 
-            overflow-y: auto; 
-        }
-
-        .back-idiom-header { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 4px; 
-            border-bottom: 1px solid #222; 
-            padding-bottom: 8px; 
-            padding-right: 115px;
-            width: 100%;
-        }
-        .back-idiom-title { font-size: 2rem; font-weight: 700; color: #ffffff; letter-spacing: 1px; word-break: break-all; }
-        
-        /* 🔊 靠右鎖定發音鍵 */
-        .back-speaker-position {
-            position: absolute;
-            top: 20px;      
-            right: 22px;    
-            z-index: 99;    
-        }
-
-        .card-speaker-btn {
-            background: #1c1c1c;
-            border: 1px solid #333;
-            color: var(--accent-master);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s ease;
-            white-space: nowrap; 
-            flex-shrink: 0;       
-        }
-        .card-speaker-btn:hover { background: #222; border-color: var(--accent-master); }
-        
-        .back-definition { font-size: 1.0rem; margin-bottom: 12px; color: var(--accent-think); font-weight: 500; line-height: 1.5; padding-right: 115px; text-align: justify; }
-
-        .section-title { font-size: 0.8rem; color: var(--accent-highlight); margin-top: 10px; margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
-        .section-text { font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px; line-height: 1.6; text-align: justify; white-space: pre-line; }
-
-        .example-header { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .example-block { margin-top: 4px; border-left: 2px solid var(--accent-master); padding-left: 12px; width: 100%; background: #111; padding: 12px; border-radius: 0 8px 8px 0; }
-        .example-en { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; }
+        .serif-title { font-family: 'Noto Serif TC', serif; font-weight: 900; }
+        .card-perspective { perspective: 1500px; }
+        .card-inner { transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .card-inner.is-flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .card-back { transform: rotateY(180deg); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30, 30, 35, 0.5); border-radius: 99px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.3); border-radius: 99px; }
+        .gold-glow { box-shadow: 0 0 25px rgba(217, 119, 6, 0.15); }
+        .emerald-glow { box-shadow: 0 0 25px rgba(13, 148, 136, 0.15); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-6 overflow-x-hidden relative">
 
-    <div id="manual-overlay">
-        <div class="manual-container">
-            <div class="cover-img-box">
-                <img src="https://r2.uploads.tw/2026/06/KQxnJG4NAw.webp" alt="黑盒子頻道主視覺封面">
-            </div>
-            <div class="cover-logic-box">
-                <div class="cover-title">古典思維成語繪本</div>
-                <div class="cover-desc">
-                    成語，是華夏文明淬煉千年的思想膠囊。<br><br>
-                    本繪本宮殿嚴格根據正統歷史文獻考據，拒絕胡編。我們將深奧的文言文記載，全面轉譯為具備強烈畫面感、生動且適合 4-10 歲孩童在 30-45 秒內聽懂的【故事這樣講】。並透過【給小寶貝的悄悄話】，將古典智慧無痛對齊孩子的現代生活與品格導向。
+    <!-- 背景動態光效 -->
+    <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber-600/5 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[10%] left-[10%] w-[350px] h-[350px] bg-teal-600/5 blur-[100px] rounded-full"></div>
+    </div>
+
+    <!-- 自定義古典確認彈窗 (Custom Modal) -->
+    <div id="customModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-[#16161c] border border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl gold-glow flex flex-col gap-4">
+            <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
+                <div class="w-10 h-10 rounded-full bg-amber-950/30 border border-amber-600/40 flex items-center justify-center text-amber-500">
+                    <i id="modalIcon" class="fa-solid fa-triangle-exclamation"></i>
                 </div>
+                <h4 id="modalTitle" class="serif-title text-lg text-amber-100">系統提示</h4>
             </div>
-            <button class="cover-btn" onclick="closeManualOverlay()">推開古典智慧大門 ➔</button>
+            <p id="modalMessage" class="text-xs text-zinc-300 leading-relaxed"></p>
+            <div class="flex gap-3 justify-end mt-2">
+                <button id="modalCancelBtn" onclick="closeModal()" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs rounded-lg transition-all">取消</button>
+                <button id="modalConfirmBtn" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 text-xs font-bold rounded-lg transition-all">確定</button>
+            </div>
         </div>
     </div>
 
-    <div class="directory-zone">
-        <span style="font-size:0.85rem; color:var(--text-sub); white-space:nowrap; font-weight:bold;">📜 當前課程目錄：</span>
-        <select id="course-dropdown" class="course-select" onchange="handleCourseSwitch(this.value)">
-            <option value="none_selected">🔍 正在同步雲端目錄...</option>
-        </select>
-    </div>
-
-    <header>
-        <div style="display: flex; align-items: center; flex-grow: 1;">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <span class="counter" id="counter">0 / 0</span>
-        </div>
-        <div class="btn-group">
-            <button class="action-btn" onclick="exportCurrentCourseProgress()">導出進度</button>
-            <button class="action-btn" onclick="clearCurrentCourseProgress()" style="color:#ff5252;">清除進度</button>
-        </div>
-    </header>
-
-    <div id="learning-stage" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: calc(100vh - 150px); justify-content: flex-start;">
-        
-        <div class="controls" id="controls">
-            <button class="btn btn-again" onclick="handleSRS('again')">🔄 稍後再思索</button>
-            <button class="btn btn-easy" onclick="handleSRS('easy')">👁️‍🗨️ 已融會貫通 (內化)</button>
-        </div>
-
-        <div class="stage" id="card-stage" onclick="flipCard()">
-            <div class="card" id="flashcard">
-                <div class="card-face card-front">
-                    <div class="idiom-title" id="front-word">請先由上方選取課程</div>
-                    <div class="hint">點擊卡片解構典故</div>
-                </div>
-
-                <div class="card-face card-back">
-                    <div class="card-image-bg" id="card-image"></div>
-                    <div class="card-back-content" onclick="event.stopPropagation();">
-                        
-                        <div class="back-idiom-header">
-                            <span class="back-idiom-title" id="back-word">-</span>
-                        </div>
-                        
-                        <button class="card-speaker-btn back-speaker-position" onclick="replayAudio();">🔊 重聽發音</button>
-                        
-                        <div class="back-definition" id="back-translation">-</div>
-                        
-                        <div class="section-title">【故事這樣講】</div>
-                        <div class="section-text" id="back-phr">-</div>
-                        
-                        <div class="example-header">
-                            <div class="section-title" style="color:var(--accent-master);">【給小寶貝的悄悄話】</div>
-                        </div>
-                        <div class="example-block">
-                            <div class="example-en" id="back-example-en">-</div>
+    <!-- 頂部導覽列與功能面板 -->
+    <header class="w-full max-w-xl z-10 flex flex-col gap-3 mt-2">
+        <!-- 課程選擇下拉選單 -->
+        <div class="relative bg-[#16161b] border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between shadow-lg">
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-amber-500/70 font-semibold tracking-wider">當前課程目錄：</span>
+                <div class="relative inline-block text-left">
+                    <button id="dropdownBtn" class="flex items-center gap-2 text-sm text-amber-500 hover:text-amber-400 font-bold tracking-wide transition focus:outline-none">
+                        <span id="currentCourseTitle">載入總表中...</span>
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <!-- 動態生成課程選單 -->
+                    <div id="dropdownMenu" class="hidden absolute left-0 mt-3 w-72 origin-top-left bg-[#131317] border border-zinc-800 rounded-xl shadow-2xl z-20 overflow-hidden custom-scrollbar max-h-60 overflow-y-auto">
+                        <div id="courseListContainer" class="py-1">
+                            <!-- JS 動態插入項目 -->
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="flex items-center gap-1 text-xs text-amber-400/80 bg-amber-950/30 border border-amber-900/40 px-2.5 py-1 rounded-full">
+                <i class="fa-solid fa-cloud shadow-sm text-[10px]"></i>
+                <span>雲端同步</span>
+            </div>
         </div>
 
-    </div>
-
-    <div id="completion-screen" class="message-screen hidden">
-        <h2>智慧沉澱，皆成階梯</h2>
-        <p>當前成語字卡庫已全數內化完成。</p>
-        <button class="file-upload-btn" onclick="resetEngine()">重新思索</button>
-    </div>
-
-    <script>
-        // 🔒 預設首課核心數據：你的成語試算表網址
-        const EXCLUSIVE_IDIOM_URL = "hhttps://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
-        
-        // 🔒 總目錄管理線路
-        const MASTER_INDEX_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
-
-        let currentCourseKey = "none_selected";
-        let originalCards = [];
-        let queue = [];
-        let currentCard = null;
-        let isFlipped = false;
-        
-        const synth = window.speechSynthesis;
-
-        const learningStage = document.getElementById('learning-stage');
-        const completionScreen = document.getElementById('completion-screen');
-        const flashcard = document.getElementById('flashcard');
-        const controls = document.getElementById('controls');
-        const progressBar = document.getElementById('progress-bar');
-        const counter = document.getElementById('counter');
-
-        // 🚪 點擊關閉首頁遮罩書，正式啟動選單與讀取
-        function closeManualOverlay() {
-            document.getElementById('manual-overlay').style.display = 'none';
-            autoFetchDirectory(); 
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function fixGoogleSpreadsheetUrl(url) {
-            let clean = url.trim();
-            if (clean.includes("docs.google.com/spreadsheets") && !clean.includes("output=csv") && !clean.includes("format=csv")) {
-                if (clean.includes("/edit")) {
-                    clean = clean.split('/edit')[0] + "/export?format=csv";
-                } else if (clean.endsWith("/")) {
-                    clean = clean + "export?format=csv";
-                } else if (!clean.includes("/export")) {
-                    clean = clean + "/export?format=csv";
-                }
-            }
-            return clean;
-        }
-
-        function autoFetchDirectory() {
-            fetch(MASTER_INDEX_URL)
-                .then(res => res.text())
-                .then(text => {
-                    const lines = text.replace(/\r/g, '').split('\n');
-                    const dropdown = document.getElementById('course-dropdown');
-                    dropdown.innerHTML = '';
-                    
-                    // 預設核心成語課本置頂
-                    const defOpt = document.createElement('option');
-                    defOpt.value = EXCLUSIVE_IDIOM_URL;
-                    defOpt.textContent = "★ 預設課程：A02 古典思維成語繪本";
-                    dropdown.appendChild(defOpt);
-                    
-                    for(let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim(); if(!line) continue;
-                        const parts = parseCSVLine(line);
-                        if(parts.length >= 2) {
-                            const csvUrl = fixGoogleSpreadsheetUrl(parts[1].trim());
-                            if(csvUrl === EXCLUSIVE_IDIOM_URL) continue; 
-                            const option = document.createElement('option');
-                            option.value = csvUrl; 
-                            option.textContent = parts[0].trim(); 
-                            dropdown.appendChild(option);
-                        }
-                    }
-                    
-                    // 恢復快取記憶
-                    const lastCourse = localStorage.getItem('idiom_final_cache_key');
-                    if(lastCourse && dropdown.querySelector(`option[value="${lastCourse}"]`)) {
-                        dropdown.value = lastCourse;
-                        currentCourseKey = lastCourse;
-                    } else {
-                        dropdown.value = EXCLUSIVE_IDIOM_URL;
-                        currentCourseKey = EXCLUSIVE_IDIOM_URL;
-                    }
-
-                    initEngineWithCache(currentCourseKey);
-                })
-                .catch(err => {
-                    initEngineWithCache(EXCLUSIVE_IDIOM_URL);
-                });
-        }
-
-        function handleCourseSwitch(value) {
-            currentCourseKey = value;
-            localStorage.setItem('idiom_final_cache_key', value);
-            initEngineWithCache(value);
-        }
-
-        function initEngineWithCache(url) {
-            fetch(url)
-                .then(res => res.text())
-                .then(text => {
-                    const cards = parseCourseCSV(text);
-                    
-                    // 🔒 獨立隔離金鑰，完全杜絕對接交叉污染
-                    const storageSuffix = btoa(url).substring(0,20);
-                    const cacheKey_queue = `idiom_final_q_${storageSuffix}`;
-                    const cacheKey_orig = `idiom_final_o_${storageSuffix}`;
-                    const cachedQueue = localStorage.getItem(cacheKey_queue);
-                    const cachedOriginal = localStorage.getItem(cacheKey_orig);
-                    
-                    if (cachedQueue && cachedOriginal) {
-                        queue = JSON.parse(cachedQueue);
-                        originalCards = JSON.parse(cachedOriginal);
-                    } else {
-                        originalCards = [...cards];
-                        let activeCards = cards.filter(c => c.historyCount !== 99);
-                        queue = shuffleArray(activeCards); // 🎲 完全隨機洗牌
-                    }
-                    updateProgress();
-                    showNextCard();
-                });
-        }
-
-        function showNextCard() {
-            if (queue.length === 0) { showCompletion(); return; }
-            isFlipped = false; flashcard.classList.remove('flipped'); controls.classList.remove('visible');
-            currentCard = queue[0];
-
-            document.getElementById('front-word').textContent = currentCard.word;
-            document.getElementById('back-word').textContent = currentCard.word;
-            
-            // 🔒 100% 精密映射：對齊你的後端資料流（B 欄一句話核心、G 欄故事、H 欄悄悄話）
-            document.getElementById('back-translation').innerHTML = currentCard.type ? `<strong>核心引子：</strong>${currentCard.type}` : '';
-            document.getElementById('back-phr').innerHTML = `<span style="color:var(--accent-master); font-weight:600;">${currentCard.translation || '#標籤'}</span><br><br>${currentCard.phr || '-'}`; 
-            document.getElementById('back-example-en').textContent = currentCard.example_en;
-            
-            document.getElementById('card-image').style.backgroundImage = `url('./${currentCard.word.toLowerCase()}.jpg')`;
-            document.querySelector('.card-back-content').scrollTop = 0;
-        }
-
-        function flipCard() {
-            if (document.getElementById('manual-overlay').style.display !== 'none') return;
-            if (isFlipped || !currentCard) return;
-            isFlipped = true; flashcard.classList.add('flipped'); controls.classList.add('visible');
-            speakCard();
-        }
-
-        function speakCard() {
-            try {
-                synth.cancel(); 
-                const utterWord = new SpeechSynthesisUtterance(currentCard.word); 
-                utterWord.lang = "zh-TW"; 
-                synth.speak(utterWord); 
-            } catch(e) {}
-        }
-
-        function replayAudio() {
-            speakCard();
-        }
-
-        function handleSRS(level) {
-            if (!isFlipped) return;
-            const card = queue.shift(); 
-            if (level === 'again') { queue.push(card); } 
-            else if (level === 'easy') {
-                const master = originalCards.find(c => c.word === card.word);
-                if(master) master.historyCount = 99; 
-            }
-            
-            const suffix = btoa(currentCourseKey).substring(0,20);
-            localStorage.setItem(`idiom_final_q_${suffix}`, JSON.stringify(queue));
-            localStorage.setItem(`idiom_final_o_${suffix}`, JSON.stringify(originalCards));
-            updateProgress(); showNextCard();
-        }
-
-        function parseCourseCSV(text) {
-            const lines = text.replace(/\r/g, '').split('\n');
-            let importedData = [];
-            for (let i = 1; i < lines.length; i++) {
-                let line = lines[i].trim(); if (!line) continue;
-                let row = parseCSVLine(line);
-                if (row.length >= 8) {
-                    importedData.push({
-                        word:         row[0] ? row[0].trim() : '', // 成語本體 (A)
-                        type:         row[1] ? row[1].trim() : '', // 一句話核心 (B)
-                        level:        row[2] ? row[2].trim() : '', // 繪本標籤 (C)
-                        translation:  row[3] ? row[3].trim() : '', // #搜尋關鍵字 (D)
-                        inflection:   row[4] ? row[4].trim() : '', 
-                        collocation:  row[5] ? row[5].trim() : '', 
-                        phr:          row[6] ? row[6].replace(/\\n/g, '\n') : '', // 故事這樣講 (G)
-                        example_en:   row[7] ? row[7].replace(/\\n/g, '\n') : '', // 給小寶貝的悄悄話 (H)
-                        example_ch:   row[8] ? row[8].trim() : '', 
-                        historyCount: row[9] ? parseFloat(row[9]) : 0
-                    });
-                }
-            }
-            return importedData;
-        }
-
-        function parseCSVLine(line) {
-            let row = [], inQuotes = false, currentField = '';
-            for (let j = 0; j < line.length; j++) {
-                let char = line[j];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { row.push(currentField.trim()); currentField = ''; }
-                else currentField += char;
-            }
-            row.push(currentField.trim());
-            return row.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
-        }
-
-        function updateProgress() {
-            const total = originalCards.length; const currentLeft = queue.length;
-            progressBar.style.width = `${total > 0 ? ((total - currentLeft) / total) * 100 : 0}%`;
-            counter.textContent = `${currentLeft} / ${total}`;
-        }
-        function showCompletion() { learningStage.classList.add('hidden'); completionScreen.classList.remove('hidden'); }
-        function resetEngine() { 
-            const suffix = btoa(currentCourseKey).substring(0,20);
-            localStorage.removeItem(`idiom_final_q_${suffix}`);
-            localStorage.removeItem(`idiom_final_o_${suffix}`);
-            initEngineWithCache(currentCourseKey); 
-        }
-        function clearCurrentCourseProgress() { if(confirm("確定歸零清除當前成語課程的內化進度？")) { const suffix = btoa(currentCourseKey).substring(0,20); localStorage.removeItem(`idiom_final_q_${suffix}`); localStorage.removeItem(`idiom_final_o_${suffix}`); initEngineWithCache(currentCourseKey); } }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 古典思維永久宮殿 — 深度觀察者</title>
-    <style>
-        :root {
-            --bg-color: #0c0c0c;
-            --card-bg: #141414;
-            --text-main: #e0e0e0;
-            --text-sub: #9e9e9e;
-            --accent-think: #ffb74d;   /* 古卷黃 */
-            --accent-master: #26a69a;  /* 竹青綠 */
-            --accent-highlight: #4db6ac;
-            --border-color: #242424;
-            --score-bg: #111111;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; 
-            align-items: center;
-            overflow: hidden;
-            padding: 10px 12px 20px 12px; 
-        }
-
-        /* 🚪 核心復位：一進去首頁的古典操作說明書遮罩層 */
-        #manual-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(10, 10, 10, 0.98);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .manual-container {
-            background: #141414;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            max-width: 580px;
-            width: 100%;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            padding: 30px 24px;
-            justify-content: space-between;
-        }
-        .cover-img-box { width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 12px; background: #000; border: 1px solid #222; }
-        .cover-img-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .cover-logic-box { text-align: left; width: 100%; padding-top: 20px; flex-grow: 1; }
-        .cover-title { font-size: 1.4rem; color: #fff; font-weight: bold; margin-bottom: 12px; border-left: 3px solid var(--accent-think); padding-left: 10px; letter-spacing: 1px; }
-        .cover-desc { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; text-align: justify; }
-        .cover-btn { background: #1c1c1c; border: 1px solid var(--accent-think); color: var(--accent-think); padding: 12px 24px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: all 0.2s ease; width: 100%; text-align: center; letter-spacing: 2px; outline: none; }
-        .cover-btn:hover { background: var(--accent-think); color: #000; box-shadow: 0 0 15px rgba(255, 183, 77, 0.3); }
-
-        /* 🌐 頂部課程切換控制區 */
-        .directory-zone {
-            width: 100%;
-            max-width: 620px;
-            background: #111;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        .course-select {
-            flex: 1;
-            background: #1c1c1c;
-            border: 1px solid #333;
-            color: var(--accent-think);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
-        }
-
-        header {
-            width: 100%;
-            max-width: 620px;
-            padding: 4px 4px 8px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            flex-shrink: 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .progress-container {
-            flex-grow: 1;
-            max-width: 220px; 
-            background: #222;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-right: 12px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent-think), var(--accent-master));
-            transition: width 0.3s ease;
-        }
-
-        .counter { font-size: 0.8rem; color: var(--text-sub); min-width: 50px; }
-        .btn-group { display: flex; gap: 6px; align-items: center; }
-
-        .action-btn {
-            background: transparent;
-            border: 1px solid #333;
-            color: var(--text-sub);
-            padding: 4px 10px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: all 0.2s ease;
-        }
-        .action-btn:hover { color: var(--text-main); border-color: var(--text-sub); }
-
-        /* 專屬雙軌控制鈕 */
-        .controls { 
-            display: flex; 
-            gap: 10px; 
-            opacity: 0; 
-            visibility: hidden;
-            height: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
-            width: 100%; 
-            max-width: 620px; 
-            flex-shrink: 0;
-        }
-        .controls.visible { 
-            opacity: 1; 
-            visibility: visible;
-            height: 48px;
-            transform: translateY(0);
-            margin-top: 6px;
-            margin-bottom: 10px;
-        }
-
-        .btn { 
-            flex: 1; 
-            background: #161616; 
-            border: 1px solid var(--border-color); 
-            padding: 10px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: var(--text-main); 
-            font-weight: 500; 
-            font-size: 0.9rem; 
-            gap: 6px;
-            transition: all 0.2s ease; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        .btn-again:hover { border-color: var(--accent-think); color: var(--accent-think); background: #1a1510; }
-        .btn-easy:hover { border-color: var(--accent-master); color: var(--accent-master); background: #101a18; }
-
-        /* 卡片大舞台 */
-        .stage { 
-            perspective: 1000px; 
-            width: 100%; 
-            max-width: 620px; 
-            flex-grow: 1;
-            cursor: pointer; 
-            margin-top: 4px;
-        }
-
-        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
-
-        /* 正面 */
-        .card-front { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
-        .card-front .idiom-title { font-size: 3.2rem; font-weight: 700; letter-spacing: 4px; text-align: center; color: #ffffff; text-shadow: 0 2px 10px rgba(255,255,255,0.05); }
-        .card-front .hint { position: absolute; bottom: 30px; font-size: 0.8rem; color: var(--text-sub); letter-spacing: 2px; }
-
-        /* 繪本插圖區 */
-        .card-image-bg { 
-            width: 100% !important; 
-            height: 35%; 
-            min-height: 140px;
-            opacity: 1.0; 
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            background-position: center; 
-            pointer-events: none; 
-            background-color: #050505; 
-            border-bottom: 1px solid var(--border-color); 
-            flex-shrink: 0; 
-        }
-
-        /* 背面大空間排版 */
-        .card-back { transform: rotateY(180deg); display: flex !important; flex-direction: column !important; justify-content: flex-start; align-items: center; padding: 0 !important; }
-        
-        .card-back-content { 
-            position: relative;
-            width: 100%; 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start; 
-            padding: 20px 22px; 
-            text-align: left; 
-            overflow-y: auto; 
-        }
-
-        .back-idiom-header { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 4px; 
-            border-bottom: 1px solid #222; 
-            padding-bottom: 8px; 
-            padding-right: 115px;
-            width: 100%;
-        }
-        .back-idiom-title { font-size: 2rem; font-weight: 700; color: #ffffff; letter-spacing: 1px; word-break: break-all; }
-        
-        /* 🔊 靠右鎖定發音鍵 */
-        .back-speaker-position {
-            position: absolute;
-            top: 20px;      
-            right: 22px;    
-            z-index: 99;    
-        }
-
-        .card-speaker-btn {
-            background: #1c1c1c;
-            border: 1px solid #333;
-            color: var(--accent-master);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s ease;
-            white-space: nowrap; 
-            flex-shrink: 0;       
-        }
-        .card-speaker-btn:hover { background: #222; border-color: var(--accent-master); }
-        
-        .back-definition { font-size: 1.0rem; margin-bottom: 12px; color: var(--accent-think); font-weight: 500; line-height: 1.5; padding-right: 115px; text-align: justify; }
-
-        .section-title { font-size: 0.8rem; color: var(--accent-highlight); margin-top: 10px; margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
-        .section-text { font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px; line-height: 1.6; text-align: justify; white-space: pre-line; }
-
-        .example-header { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .example-block { margin-top: 4px; border-left: 2px solid var(--accent-master); padding-left: 12px; width: 100%; background: #111; padding: 12px; border-radius: 0 8px 8px 0; }
-        .example-en { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; }
-    </style>
-</head>
-<body>
-
-    <div id="manual-overlay">
-        <div class="manual-container">
-            <div class="cover-img-box">
-                <img src="https://r2.uploads.tw/2026/06/KQxnJG4NAw.webp" alt="黑盒子頻道主視覺封面">
-            </div>
-            <div class="cover-logic-box">
-                <div class="cover-title">古典思維成語繪本宮殿</div>
-                <div class="cover-desc">
-                    成語，是華夏文明淬煉千年的思想膠囊。<br><br>
-                    本繪本宮殿嚴格根據正統歷史文獻考據，拒絕胡編。我們將深奧的文言文記載，全面轉譯為具備強烈畫面感、生動且適合 4-10 歲孩童在 30-45 秒內聽懂的【故事這樣講】。並透過【給小寶貝的悄悄話】，將古典智慧無痛對齊孩子的現代生活與品格導向。
+        <!-- 智慧查詢系統與進度條區塊 -->
+        <div class="flex flex-col gap-3 bg-[#121215]/80 backdrop-blur border border-zinc-800/60 p-4 rounded-xl">
+            <div class="flex justify-between items-center text-xs">
+                <span id="cardProgressText" class="text-zinc-400 font-mono">0 / 0</span>
+                <div class="flex gap-2">
+                    <button onclick="triggerResetProgress()" class="hover:text-red-400 text-zinc-400 transition flex items-center gap-1 px-2 py-0.5 rounded hover:bg-zinc-800/40">
+                        <i class="fa-solid fa-arrows-rotate"></i> 重置本課進度
+                    </button>
                 </div>
             </div>
-            <button class="cover-btn" onclick="closeManualOverlay()">推開古典智慧大門 ➔</button>
-        </div>
-    </div>
-
-    <div class="directory-zone">
-        <span style="font-size:0.85rem; color:var(--text-sub); white-space:nowrap; font-weight:bold;">📜 當前課程目錄：</span>
-        <select id="course-dropdown" class="course-select" onchange="handleCourseSwitch(this.value)">
-            <option value="none_selected">🔍 正在同步雲端目錄...</option>
-        </select>
-    </div>
-
-    <header>
-        <div style="display: flex; align-items: center; flex-grow: 1;">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
+            
+            <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                <div id="cardProgressBar" class="bg-gradient-to-r from-amber-600 to-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
             </div>
-            <span class="counter" id="counter">0 / 0</span>
+
+            <!-- 查詢搜尋框 -->
+            <div class="relative mt-1">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500 text-xs">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="searchBar" oninput="handleSearch()" placeholder="輸入成語、關鍵字標籤(如 #專注)、或故事查詢..." class="w-full bg-[#17171c] border border-zinc-800 rounded-lg pl-9 pr-8 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 transition-all">
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500 hover:text-zinc-300">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
         </div>
-        <div class="btn-group">
-            <button class="action-btn" onclick="exportCurrentCourseProgress()">導出進度</button>
-            <button class="action-btn" onclick="clearCurrentCourseProgress()" style="color:#ff5252;">清除進度</button>
+
+        <!-- 狀態篩選標籤 -->
+        <div class="flex justify-between gap-2 text-xs">
+            <button onclick="setFilter('all')" id="filter-all" class="flex-1 py-2 rounded-lg border border-zinc-700 bg-zinc-800 text-amber-500 font-bold shadow-inner transition">
+                全部成語 (<span id="count-all">0</span>)
+            </button>
+            <button onclick="setFilter('review')" id="filter-review" class="flex-1 py-2 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition">
+                待思索 (<span id="count-review">0</span>)
+            </button>
+            <button onclick="setFilter('mastered')" id="filter-mastered" class="flex-1 py-2 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition">
+                已內化 (<span id="count-mastered">0</span>)
+            </button>
         </div>
     </header>
 
-    <div id="learning-stage" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: calc(100vh - 150px); justify-content: flex-start;">
-        
-        <div class="controls" id="controls">
-            <button class="btn btn-again" onclick="handleSRS('again')">🔄 稍後再思索</button>
-            <button class="btn btn-easy" onclick="handleSRS('easy')">👁️‍🗨️ 已融會貫通 (內化)</button>
-        </div>
+    <!-- 主體：3D 翻轉卡片區 -->
+    <main class="w-full max-w-xl my-6 flex-1 flex flex-col items-center justify-center z-10">
+        <div class="card-perspective w-full aspect-[3/4.2] sm:aspect-[3/4.1] max-h-[580px] cursor-pointer" onclick="flipCard()">
+            <div id="cardInner" class="card-inner w-full h-full relative rounded-2xl shadow-2xl duration-700">
+                
+                <!-- 卡片正面 -->
+                <div class="card-front absolute inset-0 w-full h-full rounded-2xl bg-[#16161c] border border-zinc-800 flex flex-col justify-between p-8 shadow-2xl gold-glow overflow-hidden">
+                    <div class="absolute inset-0 opacity-[0.02] border-[12px] border-amber-600 m-4 pointer-events-none"></div>
+                    
+                    <div class="w-full flex justify-between items-center text-amber-500/30 text-xs tracking-widest font-mono">
+                        <span>ESTD 2026</span>
+                        <i class="fa-solid fa-feather-pointed text-sm"></i>
+                        <span>宮殿智慧系統</span>
+                    </div>
 
-        <div class="stage" id="card-stage" onclick="flipCard()">
-            <div class="card" id="flashcard">
-                <div class="card-face card-front">
-                    <div class="idiom-title" id="front-word">請先由上方選取課程</div>
-                    <div class="hint">點擊卡片解構典故</div>
+                    <div class="flex flex-col items-center gap-6 my-auto text-center">
+                        <div class="w-16 h-16 rounded-full border border-amber-500/20 flex items-center justify-center mb-2 bg-amber-950/10">
+                            <i class="fa-solid fa-scroll text-amber-500/80 text-xl"></i>
+                        </div>
+                        <h2 id="cardFrontTitle" class="serif-title text-3xl sm:text-4xl text-amber-100 leading-snug tracking-wider">
+                            正在開啟古典殿門...
+                        </h2>
+                        <span id="cardFrontSubtitle" class="text-zinc-500 text-xs font-mono tracking-widest mt-1">
+                            CLASSICAL CHENGYU
+                        </span>
+                    </div>
+
+                    <div class="w-full text-center flex flex-col items-center gap-1">
+                        <p id="cardFrontHint" class="text-zinc-400 text-xs tracking-widest font-medium animate-pulse">
+                            請稍候，正向雲端藏經閣調閱典故
+                        </p>
+                        <div class="w-8 h-[2px] bg-amber-600/40 mt-1"></div>
+                    </div>
                 </div>
 
-                <div class="card-face card-back">
-                    <div class="card-image-bg" id="card-image"></div>
-                    <div class="card-back-content" onclick="event.stopPropagation();">
+                <!-- 卡片背面 -->
+                <div class="card-back absolute inset-0 w-full h-full rounded-2xl bg-[#131317] border border-zinc-800 flex flex-col p-5 shadow-2xl emerald-glow overflow-hidden">
+                    <div class="w-full h-full overflow-y-auto pr-1.5 custom-scrollbar flex flex-col gap-4">
                         
-                        <div class="back-idiom-header">
-                            <span class="back-idiom-title" id="back-word">-</span>
+                        <!-- 1. 插圖區域 -->
+                        <div class="w-full aspect-[16/10] sm:aspect-[16/9.5] rounded-xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950">
+                            <img id="cardBackImage" src="https://placehold.co/600x450/111115/ffffff?text=Loading+Image" alt="精緻插圖" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#131317] via-transparent to-transparent"></div>
                         </div>
-                        
-                        <button class="card-speaker-btn back-speaker-position" onclick="replayAudio();">🔊 重聽發音</button>
-                        
-                        <div class="back-definition" id="back-translation">-</div>
-                        
-                        <div class="section-title">【故事這樣講】</div>
-                        <div class="section-text" id="back-phr">-</div>
-                        
-                        <div class="example-header">
-                            <div class="section-title" style="color:var(--accent-master);">【給小寶貝的悄悄話】</div>
+
+                        <!-- 2. 標題與語音朗讀區 -->
+                        <div class="flex items-start justify-between border-b border-zinc-800/60 pb-3">
+                            <div class="flex-1 mr-4">
+                                <h3 id="cardBackTitle" class="serif-title text-2xl text-zinc-100 tracking-wider">載入中</h3>
+                                <!-- 智慧搜尋關鍵字標籤渲染區 -->
+                                <div id="cardBackKeywords" class="flex flex-wrap gap-1.5 mt-2">
+                                    <!-- 動態生成 Hashtag 標籤 -->
+                                </div>
+                            </div>
+                            <button onclick="speakText(event)" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-teal-400 text-xs rounded-lg transition-all shadow-md shrink-0">
+                                <i class="fa-solid fa-volume-high text-sm"></i>
+                                <span class="font-bold">發音測試</span>
+                            </button>
                         </div>
-                        <div class="example-block">
-                            <div class="example-en" id="back-example-en">-</div>
+
+                        <!-- 3. 一句話核心 -->
+                        <p id="cardBackMeaning" class="text-sm font-medium text-teal-400/90 tracking-wide border-l-2 border-teal-500 pl-3 leading-relaxed">
+                            讀取中...
+                        </p>
+
+                        <!-- 4. 故事這樣講 -->
+                        <div class="bg-zinc-900/50 border border-zinc-800/40 p-4 rounded-xl">
+                            <h4 class="text-xs text-amber-500/90 font-bold tracking-widest mb-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>【故事這樣講】
+                            </h4>
+                            <p id="cardBackStory" class="text-zinc-300 text-xs leading-relaxed tracking-wide text-justify">讀取中...</p>
+                        </div>
+
+                        <!-- 5. 給小寶貝的悄悄話 -->
+                        <div class="bg-teal-950/10 border border-teal-900/20 p-4 rounded-xl">
+                            <h4 class="text-xs text-teal-400/90 font-bold tracking-widest mb-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>【給小寶貝的悄悄話】
+                            </h4>
+                            <p id="cardBackWhisper" class="text-zinc-300 text-xs leading-relaxed tracking-wide text-justify italic">讀取中...</p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
+    </main>
 
-    </div>
+    <!-- 底部控制按鈕區 -->
+    <footer class="w-full max-w-xl z-10 flex flex-col gap-4 mb-2">
+        <div class="flex justify-between gap-4">
+            <button onclick="markCard('review')" class="flex-1 py-3 px-4 bg-[#16161c] border border-zinc-800 hover:border-amber-500/50 hover:bg-amber-950/10 text-amber-500 hover:text-amber-400 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                <i class="fa-solid fa-circle-question text-base"></i>
+                <span>稍後再思索</span>
+            </button>
+            <button onclick="markCard('mastered')" class="flex-1 py-3 px-4 bg-teal-950/20 border border-teal-900/40 hover:border-teal-500/50 hover:bg-teal-900/30 text-teal-400 hover:text-teal-300 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                <i class="fa-solid fa-eye text-base"></i>
+                <span>尋 已融會貫通 (內化)</span>
+            </button>
+        </div>
 
-    <div id="completion-screen" class="message-screen hidden">
-        <h2>智慧沉澱，皆成階梯</h2>
-        <p>當前成語字卡庫已全數內化完成。</p>
-        <button class="file-upload-btn" onclick="resetEngine()">重新思索</button>
-    </div>
+        <div class="flex items-center justify-between px-2 text-sm text-zinc-400">
+            <button onclick="prevCard()" class="hover:text-amber-500 transition-all flex items-center gap-2 p-2 rounded hover:bg-zinc-900/40">
+                <i class="fa-solid fa-arrow-left"></i> 上一殿
+            </button>
+            <span class="text-xs font-mono tracking-widest text-zinc-500">智慧之鑰 左右導航</span>
+            <button onclick="nextCard()" class="hover:text-amber-500 transition-all flex items-center gap-2 p-2 rounded hover:bg-zinc-900/40">
+                下一殿 <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </footer>
 
     <script>
-        // 🔒 預設首課核心數據：你的成語試算表網址
-        const EXCLUSIVE_IDIOM_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
-        
-        // 🔒 總目錄管理線路
-        const MASTER_INDEX_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwcq7RkVq_FVU4iYHMLTFQW_DIRkqgaSsp1dEkEp0zYxz-saj00T-IM2Km8WbT41oFrzkUUXMqQp-j/pub?output=csv";
+        // ======= 🛠️ 在此填入您的 GOOGLE 總表 CSV 連結 =======
+        const MASTER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1k31Y8gcrT35xn_eTZrcqMbBupx-FSqJXTb5ae-iGwQq644w8FD596mk8FLBEnMdN7tUmWubnjAvk/pub?output=csv";
 
-        let currentCourseKey = "none_selected";
-        let originalCards = [];
-        let queue = [];
-        let currentCard = null;
+        // 狀態變數
+        let coursesMap = {}; 
+        let currentCourseName = "";
+        let currentCourseCards = []; 
+        let currentIndex = 0;
         let isFlipped = false;
+        let currentFilter = "all"; 
+        let searchQuery = "";
         
-        const synth = window.speechSynthesis;
+        let progress = JSON.parse(localStorage.getItem("palace_sheets_progress")) || {};
 
-        const learningStage = document.getElementById('learning-stage');
-        const completionScreen = document.getElementById('completion-screen');
-        const flashcard = document.getElementById('flashcard');
-        const controls = document.getElementById('controls');
-        const progressBar = document.getElementById('progress-bar');
-        const counter = document.getElementById('counter');
+        const dropdownBtn = document.getElementById("dropdownBtn");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        const currentCourseTitle = document.getElementById("currentCourseTitle");
+        const cardInner = document.getElementById("cardInner");
+        const searchBar = document.getElementById("searchBar");
+        const clearSearchBtn = document.getElementById("clearSearchBtn");
+        const courseListContainer = document.getElementById("courseListContainer");
 
-        // 🚪 點擊關閉首頁遮罩書，正式啟動選單與讀取
-        function closeManualOverlay() {
-            document.getElementById('manual-overlay').style.display = 'none';
-            autoFetchDirectory(); 
-        }
+        dropdownBtn.addEventListener("click", (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); });
+        document.addEventListener("click", () => { dropdownMenu.classList.add("hidden"); });
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function fixGoogleSpreadsheetUrl(url) {
-            let clean = url.trim();
-            if (clean.includes("docs.google.com/spreadsheets") && !clean.includes("output=csv") && !clean.includes("format=csv")) {
-                if (clean.includes("/edit")) {
-                    clean = clean.split('/edit')[0] + "/export?format=csv";
-                } else if (clean.endsWith("/")) {
-                    clean = clean + "export?format=csv";
-                } else if (!clean.includes("/export")) {
-                    clean = clean + "/export?format=csv";
+        // CSV 解析核心邏輯
+        function parseCSV(text) {
+            let lines = [];
+            let row = [""];
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
                 }
             }
-            return clean;
-        }
-
-        function autoFetchDirectory() {
-            fetch(MASTER_INDEX_URL)
-                .then(res => res.text())
-                .then(text => {
-                    const lines = text.replace(/\r/g, '').split('\n');
-                    const dropdown = document.getElementById('course-dropdown');
-                    dropdown.innerHTML = '';
-                    
-                    // 預設核心成語課本置頂
-                    const defOpt = document.createElement('option');
-                    defOpt.value = EXCLUSIVE_IDIOM_URL;
-                    defOpt.textContent = "★ 預設課程：A02 古典思維成語繪本";
-                    dropdown.appendChild(defOpt);
-                    
-                    for(let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim(); if(!line) continue;
-                        const parts = parseCSVLine(line);
-                        if(parts.length >= 2) {
-                            const csvUrl = fixGoogleSpreadsheetUrl(parts[1].trim());
-                            if(csvUrl === EXCLUSIVE_IDIOM_URL) continue; 
-                            const option = document.createElement('option');
-                            option.value = csvUrl; 
-                            option.textContent = parts[0].trim(); 
-                            dropdown.appendChild(option);
-                        }
-                    }
-                    
-                    // 恢復快取記憶
-                    const lastCourse = localStorage.getItem('idiom_final_cache_key');
-                    if(lastCourse && dropdown.querySelector(`option[value="${lastCourse}"]`)) {
-                        dropdown.value = lastCourse;
-                        currentCourseKey = lastCourse;
-                    } else {
-                        dropdown.value = EXCLUSIVE_IDIOM_URL;
-                        currentCourseKey = EXCLUSIVE_IDIOM_URL;
-                    }
-
-                    initEngineWithCache(currentCourseKey);
-                })
-                .catch(err => {
-                    initEngineWithCache(EXCLUSIVE_IDIOM_URL);
-                });
-        }
-
-        function handleCourseSwitch(value) {
-            currentCourseKey = value;
-            localStorage.setItem('idiom_final_cache_key', value);
-            initEngineWithCache(value);
-        }
-
-        function initEngineWithCache(url) {
-            fetch(url)
-                .then(res => res.text())
-                .then(text => {
-                    const cards = parseCourseCSV(text);
-                    
-                    // 🔒 獨立隔離金鑰，完全杜絕對接交叉污染
-                    const storageSuffix = btoa(url).substring(0,20);
-                    const cacheKey_queue = `idiom_final_q_${storageSuffix}`;
-                    const cacheKey_orig = `idiom_final_o_${storageSuffix}`;
-                    const cachedQueue = localStorage.getItem(cacheKey_queue);
-                    const cachedOriginal = localStorage.getItem(cacheKey_orig);
-                    
-                    if (cachedQueue && cachedOriginal) {
-                        queue = JSON.parse(cachedQueue);
-                        originalCards = JSON.parse(cachedOriginal);
-                    } else {
-                        originalCards = [...cards];
-                        let activeCards = cards.filter(c => c.historyCount !== 99);
-                        queue = shuffleArray(activeCards); // 🎲 完全隨機洗牌
-                    }
-                    updateProgress();
-                    showNextCard();
-                });
-        }
-
-        function showNextCard() {
-            if (queue.length === 0) { showCompletion(); return; }
-            isFlipped = false; flashcard.classList.remove('flipped'); controls.classList.remove('visible');
-            currentCard = queue[0];
-
-            document.getElementById('front-word').textContent = currentCard.word;
-            document.getElementById('back-word').textContent = currentCard.word;
+            if (row.length > 1 || row[0] !== '') lines.push(row);
             
-            // 🔒 100% 精密映射：對齊你的後端資料流（B 欄一句話核心、G 欄故事、H 欄悄悄話）
-            document.getElementById('back-translation').innerHTML = currentCard.type ? `<strong>核心引子：</strong>${currentCard.type}` : '';
-            document.getElementById('back-phr').innerHTML = `<span style="color:var(--accent-master); font-weight:600;">${currentCard.translation || '#標籤'}</span><br><br>${currentCard.phr || '-'}`; 
-            document.getElementById('back-example-en').textContent = currentCard.example_en;
+            const headers = lines[0].map(h => h.trim());
+            return lines.slice(1).map(line => {
+                let obj = {};
+                headers.forEach((header, index) => {
+                    let val = line[index] ? line[index].trim() : "";
+                    
+                    // 核心欄位多重對應：直接完美兼容 Google 試算表全新中文命名規範
+                    if (header === "序號" || header === "id") {
+                        obj.id = val;
+                    } else if (header === "成語名稱" || header === "title" || header === "frontTitle") {
+                        obj.title = val;
+                        obj.frontTitle = val; 
+                    } else if (header === "搜尋關鍵字" || header === "關鍵字") {
+                        obj.keywords = val; // #專注 #誠實 
+                    } else if (header === "一句話核心" || header === "釋義" || header === "meaning") {
+                        obj.meaning = val;
+                    } else if (header === "故事這樣講" || header === "story") {
+                        obj.story = val;
+                    } else if (header === "給小寶貝的悄悄話" || header === "whisper") {
+                        obj.whisper = val;
+                    } else if (header === "插圖網址" || header === "image") {
+                        obj.image = val;
+                    } else {
+                        obj[header] = val; 
+                    }
+                });
+                return obj;
+            });
+        }
+
+        // 自定義古典確認彈窗邏輯
+        function showCustomModal(title, message, isConfirm, onConfirmCallback) {
+            const modal = document.getElementById("customModal");
+            const mTitle = document.getElementById("modalTitle");
+            const mMsg = document.getElementById("modalMessage");
+            const mCancel = document.getElementById("modalCancelBtn");
+            const mConfirm = document.getElementById("modalConfirmBtn");
+            const mIcon = document.getElementById("modalIcon");
+
+            mTitle.innerText = title;
+            mMsg.innerText = message;
             
-            document.getElementById('card-image').style.backgroundImage = `url('./${currentCard.word.toLowerCase()}.jpg')`;
-            document.querySelector('.card-back-content').scrollTop = 0;
+            if (isConfirm) {
+                mCancel.classList.remove("hidden");
+                mIcon.className = "fa-solid fa-triangle-exclamation";
+            } else {
+                mCancel.classList.add("hidden");
+                mIcon.className = "fa-solid fa-circle-info text-teal-400";
+            }
+
+            mConfirm.onclick = () => {
+                modal.classList.add("hidden");
+                if (onConfirmCallback) onConfirmCallback();
+            };
+
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("customModal").classList.add("hidden");
+        }
+
+        // 1. 初始化：讀取總表
+        async function initSystem() {
+            try {
+                const response = await fetch(MASTER_CSV_URL);
+                if (!response.ok) throw new Error("無法抓取總表資料");
+                const text = await response.text();
+                const data = parseCSV(text);
+
+                courseListContainer.innerHTML = "";
+                
+                data.forEach((row, idx) => {
+                    const name = row.course_name;
+                    const url = row.csv_url;
+                    if (name && url) {
+                        coursesMap[name] = url;
+                        if (!progress[name]) { progress[name] = { review: [], mastered: [] }; }
+                        
+                        const btn = document.createElement("button");
+                        btn.className = "w-full text-left px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800/50 hover:text-amber-400 font-bold tracking-wide transition border-b border-zinc-800/30";
+                        btn.innerHTML = `★ ${name}`;
+                        btn.onclick = () => loadSubCourse(name);
+                        courseListContainer.appendChild(btn);
+
+                        if (idx === 0) currentCourseName = name;
+                    }
+                });
+
+                if (currentCourseName) {
+                    await loadSubCourse(currentCourseName);
+                } else {
+                    currentCourseTitle.innerText = "總表中無任何成語課程";
+                }
+            } catch (err) {
+                console.error(err);
+                currentCourseTitle.innerText = "殿堂總表連結失敗";
+                showCustomModal("系統載入失敗", "請確認 MASTER_CSV_URL 已正確發佈到網路，並確保其格式為 CSV 格式。", false);
+            }
+        }
+
+        // 2. 載入子分表
+        async function loadSubCourse(courseName) {
+            currentCourseName = courseName;
+            currentCourseTitle.innerText = `★ ${courseName}`;
+            currentIndex = 0;
+            isFlipped = false;
+            cardInner.classList.remove("is-flipped");
+            clearSearch();
+
+            document.getElementById("cardFrontTitle").innerText = "正在自閣中取卷...";
+            document.getElementById("cardFrontHint").innerText = "加載雲端分表中...";
+
+            try {
+                const subUrl = coursesMap[courseName];
+                const response = await fetch(subUrl);
+                if (!response.ok) throw new Error("分表載入失敗");
+                const text = await response.text();
+                
+                currentCourseCards = parseCSV(text);
+
+                updateFiltersCount();
+                renderCard();
+            } catch (err) {
+                console.error(err);
+                document.getElementById("cardFrontTitle").innerText = "古籍卷軸載入失敗";
+                document.getElementById("cardFrontHint").innerText = "請確認此課分表是否已發佈至網路並選擇 CSV 格式。";
+                showCustomModal("分表加載失敗", `無法取得【${courseName}】的資料。請確認分表 Google 試算表的共用設定及發佈網址正確無誤。`, false);
+            }
+        }
+
+        // 篩選與智慧搜尋機制 (相容成語名稱、故事、一句話核心、以及關鍵字標籤)
+        function getFilteredCards() {
+            let cards = [...currentCourseCards];
+            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
+            
+            if (currentFilter === "review") {
+                cards = cards.filter(card => courseProg.review.includes(card.id));
+            } else if (currentFilter === "mastered") {
+                cards = cards.filter(card => courseProg.mastered.includes(card.id));
+            }
+
+            if (searchQuery.trim() !== "") {
+                const query = searchQuery.toLowerCase().trim();
+                cards = cards.filter(card => 
+                    (card.title && card.title.toLowerCase().includes(query)) || 
+                    (card.meaning && card.meaning.toLowerCase().includes(query)) || 
+                    (card.story && card.story.toLowerCase().includes(query)) || 
+                    (card.keywords && card.keywords.toLowerCase().includes(query))
+                );
+            }
+            return cards;
+        }
+
+        function handleSearch() {
+            searchQuery = searchBar.value;
+            currentIndex = 0;
+            clearSearchBtn.classList.toggle("hidden", searchQuery.length === 0);
+            renderCard();
+        }
+
+        function clearSearch() {
+            searchBar.value = ""; searchQuery = "";
+            clearSearchBtn.classList.add("hidden");
+            renderCard();
+        }
+
+        // 點擊 Hashtag 自動進行智慧過濾
+        function tagSearch(tagName) {
+            searchBar.value = tagName;
+            handleSearch();
+        }
+
+        // 渲染字卡
+        function renderCard() {
+            const filtered = getFilteredCards();
+            
+            if (filtered.length === 0) {
+                document.getElementById("cardFrontTitle").innerHTML = "無對應的智慧字卡";
+                document.getElementById("cardFrontSubtitle").innerText = "NO CARDS FOUND";
+                document.getElementById("cardBackTitle").innerText = "空無一物";
+                document.getElementById("cardBackMeaning").innerText = "未找到符合篩選或搜尋條件的字卡。";
+                document.getElementById("cardBackStory").innerText = "請嘗試清空搜尋框或更換分類標籤。";
+                document.getElementById("cardBackWhisper").innerText = "";
+                document.getElementById("cardBackImage").src = "https://placehold.co/600x450/111115/ffffff?text=No+Match";
+                document.getElementById("cardProgressText").innerText = "0 / 0";
+                document.getElementById("cardProgressBar").style.width = "0%";
+                document.getElementById("cardBackKeywords").innerHTML = "";
+                return;
+            }
+
+            if (currentIndex >= filtered.length) currentIndex = filtered.length - 1;
+            if (currentIndex < 0) currentIndex = 0;
+
+            const card = filtered[currentIndex];
+            
+            // 正面
+            document.getElementById("cardFrontTitle").innerHTML = card.title || "未命名卡片";
+            document.getElementById("cardFrontSubtitle").innerText = "CLASSICAL CHENGYU";
+            document.getElementById("cardFrontHint").innerText = "點擊卡片推開智慧大門";
+
+            // 背面圖片與基本資料
+            document.getElementById("cardBackImage").src = card.image || "https://placehold.co/600x450/111115/ffffff?text=%E6%9A%9B%E7%84%A1%E6%8F%92%E5%9C%96";
+            document.getElementById("cardBackTitle").innerText = card.title || "無標題";
+            
+            // 解析與渲染搜尋關鍵字 (Hashtag pills)
+            const keywordContainer = document.getElementById("cardBackKeywords");
+            keywordContainer.innerHTML = "";
+            if (card.keywords) {
+                // 將 "#專注 #誠實" 切割為獨立標籤，過濾掉空值
+                const tags = card.keywords.split(/[\s,，#]+/).filter(t => t.trim() !== "");
+                tags.forEach(tag => {
+                    const pill = document.createElement("button");
+                    pill.className = "px-2.5 py-0.5 bg-amber-950/30 hover:bg-amber-900/50 text-amber-500 hover:text-amber-300 text-[10px] rounded border border-amber-900/50 transition-all font-medium";
+                    pill.innerHTML = `# ${tag}`;
+                    // 防止冒泡觸發翻牌，並調用 tag 搜尋
+                    pill.onclick = (e) => { e.stopPropagation(); tagSearch(`#${tag}`); };
+                    keywordContainer.appendChild(pill);
+                });
+            }
+
+            document.getElementById("cardBackMeaning").innerText = card.meaning || "無核心一句話";
+            document.getElementById("cardBackStory").innerText = card.story || "暫無故事內容";
+            document.getElementById("cardBackWhisper").innerText = card.whisper || "";
+
+            const total = filtered.length;
+            document.getElementById("cardProgressText").innerText = `${currentIndex + 1} / ${total}`;
+            document.getElementById("cardProgressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+            updateButtonStyles(card.id);
+        }
+
+        function updateButtonStyles(cardId) {
+            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
+            const isReview = courseProg.review.includes(cardId);
+            const isMastered = courseProg.mastered.includes(cardId);
+
+            const reviewBtn = document.querySelector("button[onclick=\"markCard('review')\"]");
+            const masteredBtn = document.querySelector("button[onclick=\"markCard('mastered')\"]");
+
+            reviewBtn.className = isReview 
+                ? "flex-1 py-3 px-4 bg-amber-950/40 border border-amber-600 text-amber-300 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-inner gold-glow"
+                : "flex-1 py-3 px-4 bg-[#16161c] border border-zinc-800 text-amber-500 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg";
+
+            masteredBtn.className = isMastered
+                ? "flex-1 py-3 px-4 bg-teal-950/40 border border-teal-500 text-teal-300 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-inner emerald-glow"
+                : "flex-1 py-3 px-4 bg-teal-950/20 border border-teal-900/40 text-teal-400 text-sm font-bold tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg";
         }
 
         function flipCard() {
-            if (document.getElementById('manual-overlay').style.display !== 'none') return;
-            if (isFlipped || !currentCard) return;
-            isFlipped = true; flashcard.classList.add('flipped'); controls.classList.add('visible');
-            speakCard();
+            isFlipped = !isFlipped;
+            cardInner.classList.toggle("is-flipped", isFlipped);
         }
 
-        function speakCard() {
-            try {
-                synth.cancel(); 
-                const utterWord = new SpeechSynthesisUtterance(currentCard.word); 
-                utterWord.lang = "zh-TW"; 
-                synth.speak(utterWord); 
-            } catch(e) {}
+        function nextCard() {
+            const filtered = getFilteredCards(); if (filtered.length <= 1) return;
+            isFlipped = false; cardInner.classList.remove("is-flipped");
+            setTimeout(() => { currentIndex = (currentIndex + 1) % filtered.length; renderCard(); }, 150);
         }
 
-        function replayAudio() {
-            speakCard();
+        function prevCard() {
+            const filtered = getFilteredCards(); if (filtered.length <= 1) return;
+            isFlipped = false; cardInner.classList.remove("is-flipped");
+            setTimeout(() => { currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; renderCard(); }, 150);
         }
 
-        function handleSRS(level) {
-            if (!isFlipped) return;
-            const card = queue.shift(); 
-            if (level === 'again') { queue.push(card); } 
-            else if (level === 'easy') {
-                const master = originalCards.find(c => c.word === card.word);
-                if(master) master.historyCount = 99; 
+        document.addEventListener("keydown", (e) => {
+            if (document.activeElement === searchBar) return;
+            if (e.key === "ArrowRight") nextCard();
+            else if (e.key === "ArrowLeft") prevCard();
+            else if (e.key === " ") { e.preventDefault(); flipCard(); }
+        });
+
+        function markCard(status) {
+            const filtered = getFilteredCards(); if (filtered.length === 0) return;
+            const cardId = filtered[currentIndex].id;
+            let courseProg = progress[currentCourseName];
+
+            if (status === "review") {
+                const index = courseProg.review.indexOf(cardId);
+                if (index > -1) { courseProg.review.splice(index, 1); } 
+                else { courseProg.review.push(cardId); const mIndex = courseProg.mastered.indexOf(cardId); if (mIndex > -1) courseProg.mastered.splice(mIndex, 1); }
+            } else if (status === "mastered") {
+                const index = courseProg.mastered.indexOf(cardId);
+                if (index > -1) { courseProg.mastered.splice(index, 1); } 
+                else { courseProg.mastered.push(cardId); const rIndex = courseProg.review.indexOf(cardId); if (rIndex > -1) courseProg.review.splice(rIndex, 1); }
             }
-            
-            const suffix = btoa(currentCourseKey).substring(0,20);
-            localStorage.setItem(`idiom_final_q_${suffix}`, JSON.stringify(queue));
-            localStorage.setItem(`idiom_final_o_${suffix}`, JSON.stringify(originalCards));
-            updateProgress(); showNextCard();
+
+            localStorage.setItem("palace_sheets_progress", JSON.stringify(progress));
+            updateFiltersCount();
+            renderCard();
         }
 
-        function parseCourseCSV(text) {
-            const lines = text.replace(/\r/g, '').split('\n');
-            let importedData = [];
-            for (let i = 1; i < lines.length; i++) {
-                let line = lines[i].trim(); if (!line) continue;
-                let row = parseCSVLine(line);
-                if (row.length >= 8) {
-                    importedData.push({
-                        word:         row[0] ? row[0].trim() : '', // 成語本體 (A)
-                        type:         row[1] ? row[1].trim() : '', // 一句話核心 (B)
-                        level:        row[2] ? row[2].trim() : '', // 繪本標籤 (C)
-                        translation:  row[3] ? row[3].trim() : '', // #搜尋關鍵字 (D)
-                        inflection:   row[4] ? row[4].trim() : '', 
-                        collocation:  row[5] ? row[5].trim() : '', 
-                        phr:          row[6] ? row[6].replace(/\\n/g, '\n') : '', // 故事這樣講 (G)
-                        example_en:   row[7] ? row[7].replace(/\\n/g, '\n') : '', // 給小寶貝的悄悄話 (H)
-                        example_ch:   row[8] ? row[8].trim() : '', 
-                        historyCount: row[9] ? parseFloat(row[9]) : 0
-                    });
-                }
+        function updateFiltersCount() {
+            if (!currentCourseName) return;
+            const allCards = currentCourseCards;
+            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
+            document.getElementById("count-all").innerText = allCards.length;
+            document.getElementById("count-review").innerText = courseProg.review.length;
+            document.getElementById("count-mastered").innerText = courseProg.mastered.length;
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType; currentIndex = 0; isFlipped = false; cardInner.classList.remove("is-flipped");
+            ["all", "review", "mastered"].forEach(type => {
+                const btn = document.getElementById(`filter-${type}`);
+                btn.className = (type === filterType)
+                    ? "flex-1 py-2 rounded-lg border border-zinc-700 bg-zinc-800 text-amber-500 font-bold shadow-inner transition"
+                    : "flex-1 py-2 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition";
+            });
+            renderCard();
+        }
+
+        function speakText(event) {
+            event.stopPropagation();
+            const filtered = getFilteredCards(); if (filtered.length === 0) return;
+            const card = filtered[currentIndex];
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(card.title);
+                utterance.lang = "zh-TW"; 
+                utterance.rate = 0.85;    
+                window.speechSynthesis.speak(utterance);
             }
-            return importedData;
         }
 
-        function parseCSVLine(line) {
-            let row = [], inQuotes = false, currentField = '';
-            for (let j = 0; j < line.length; j++) {
-                let char = line[j];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { row.push(currentField.trim()); currentField = ''; }
-                else currentField += char;
-            }
-            row.push(currentField.trim());
-            return row.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
+        function triggerResetProgress() {
+            showCustomModal(
+                "重置內化進度", 
+                `您確定要清空當前【${currentCourseName}】的所有已內化與思索狀態嗎？這將會使本課字卡回復到初始未讀狀態。`, 
+                true, 
+                executeClearProgress
+            );
         }
 
-        function updateProgress() {
-            const total = originalCards.length; const currentLeft = queue.length;
-            progressBar.style.width = `${total > 0 ? ((total - currentLeft) / total) * 100 : 0}%`;
-            counter.textContent = `${currentLeft} / ${total}`;
+        function executeClearProgress() {
+            progress[currentCourseName] = { review: [], mastered: [] };
+            localStorage.setItem("palace_sheets_progress", JSON.stringify(progress));
+            currentIndex = 0; 
+            isFlipped = false; 
+            cardInner.classList.remove("is-flipped");
+            clearSearch(); 
+            updateFiltersCount(); 
+            renderCard();
         }
-        function showCompletion() { learningStage.classList.add('hidden'); completionScreen.classList.remove('hidden'); }
-        function resetEngine() { 
-            const suffix = btoa(currentCourseKey).substring(0,20);
-            localStorage.removeItem(`idiom_final_q_${suffix}`);
-            localStorage.removeItem(`idiom_final_o_${suffix}`);
-            initEngineWithCache(currentCourseKey); 
-        }
-        function clearCurrentCourseProgress() { if(confirm("確定歸零清除當前成語課程的內化進度？")) { const suffix = btoa(currentCourseKey).substring(0,20); localStorage.removeItem(`idiom_final_q_${suffix}`); localStorage.removeItem(`idiom_final_o_${suffix}`); initEngineWithCache(currentCourseKey); } }
+
+        // 啟動系統
+        initSystem();
     </script>
 </body>
 </html>
