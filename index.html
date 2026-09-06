@@ -356,7 +356,8 @@
     </footer>
 
     <script>
-        const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEtz5ifxuJjLi0xT9zJIu292hlQ068lgLp3vCLggyYxun0Z0Y5S8ZOwG8gTbBP8kW8KbvOxKvQhLTk/pub?output=csv";
+        // 指定分頁 gid=1690816227 的精確 CSV 讀取網址
+        const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEtz5ifxuJjLi0xT9zJIu292hlQ068lgLp3vCLggyYxun0Z0Y5S8ZOwG8gTbBP8kW8KbvOxKvQhLTk/pub?gid=1690816227&single=true&output=csv";
         const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJWQh9F7rQ1UVKU-TiujGmLUWVUWGQ4lzRmJh3KisdJ1ypT7JWdX1UxCRzZZXvA5Du/exec"; 
 
         let allMasterCards = [];
@@ -468,7 +469,7 @@
             `;
             courseModalGrid.appendChild(allBtn);
 
-            // 各課文單元選項
+            // 各課文單元選項（依日期降序排列）
             const matchedCourses = allCourseCategories.filter(c => c.toLowerCase().includes(query));
             document.getElementById("courseCountTag").innerText = `共 ${allCourseCategories.length} 個課文單元`;
 
@@ -534,10 +535,18 @@
             return r;
         }
 
+        // 強破快取讀取函式
         async function reloadFromSheets() {
             syncStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 同步中...';
             try {
-                const res = await fetch(SHEETS_CSV_URL + "&t=" + Date.now());
+                const bustUrl = `${SHEETS_CSV_URL}&_nocache=${Date.now()}_${Math.random()}`;
+                const res = await fetch(bustUrl, {
+                    cache: "no-store",
+                    headers: {
+                        'Pragma': 'no-cache',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
                 const csvText = await res.text();
                 const rows = parseCSV(csvText);
                 
@@ -576,7 +585,7 @@
                 });
 
                 selectCourseFilter(selectedCourseFilter);
-                syncStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> 同步完成';
+                syncStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> 同步完成 (${allMasterCards.length} 筆)`;
             } catch (err) {
                 syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i> 連線失敗';
                 showCustomModal("同步失敗", "無法自 Google 試算表取得資料，請檢查網路或發布設定。", false);
