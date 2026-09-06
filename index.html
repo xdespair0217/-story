@@ -54,7 +54,7 @@
         <div class="absolute bottom-[10%] left-[10%] w-[350px] h-[350px] bg-teal-600/5 blur-[100px] rounded-full"></div>
     </div>
 
-    <!-- 自定義古典確認彈窗 -->
+    <!-- 自定義通用確認彈窗 -->
     <div id="customModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
         <div class="bg-[#16161c] border border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl gold-glow flex flex-col gap-4">
             <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
@@ -71,13 +71,44 @@
         </div>
     </div>
 
-    <!-- 典籍藏書閣（課文快速搜尋彈窗 - 由新到舊排列） -->
+    <!-- 新增卡片自訂對話框 -->
+    <div id="newCardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-[#16161c] border border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl gold-glow flex flex-col gap-4">
+            <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
+                <div class="w-10 h-10 rounded-full bg-amber-950/30 border border-amber-600/40 flex items-center justify-center text-amber-500">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h4 class="serif-title text-lg text-amber-100">建立新成語卡</h4>
+            </div>
+            <div class="flex flex-col gap-3 text-xs">
+                <div>
+                    <label class="text-zinc-400 block mb-1">歸屬課文：</label>
+                    <input type="text" id="newCardCourseInput" class="w-full bg-[#1c1c24] border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="text-zinc-400 block mb-1">圖片編號 (ID)：</label>
+                    <input type="text" id="newCardIdInput" class="w-full bg-[#1c1c24] border border-zinc-700 rounded-lg px-3 py-2 text-amber-400 font-mono focus:outline-none focus:border-amber-500">
+                    <span class="text-[10px] text-zinc-500 mt-1 block">本機圖檔將對應：<span id="newCardFilePreview" class="text-teal-400 font-mono">--.jpg</span></span>
+                </div>
+                <div>
+                    <label class="text-zinc-400 block mb-1">成語名稱：</label>
+                    <input type="text" id="newCardTitleInput" value="新成語名稱" class="w-full bg-[#1c1c24] border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-2">
+                <button onclick="closeNewCardModal()" class="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs rounded-lg transition-all">取消</button>
+                <button onclick="confirmAddNewCard()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 text-xs font-bold rounded-lg transition-all">確認建立</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 典籍藏書閣（單元篩選彈窗） -->
     <div id="courseSelectModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
         <div class="bg-[#141418] border border-zinc-800 w-full max-w-2xl max-h-[85vh] rounded-2xl p-6 flex flex-col gap-4 shadow-2xl gold-glow relative">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group text-amber-500"></i>
-                    <h3 class="serif-title text-lg text-zinc-100">典籍藏書閣 · 依日期由新至舊</h3>
+                    <i class="fa-solid fa-filter text-amber-500"></i>
+                    <h3 class="serif-title text-lg text-zinc-100">典籍藏書閣 · 單元篩選</h3>
                     <span id="courseCountTag" class="text-xs text-zinc-500 font-mono">0 個單元</span>
                 </div>
                 <button onclick="toggleCourseModal()" class="text-zinc-400 hover:text-zinc-100 p-2 text-base transition">
@@ -89,7 +120,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500 text-xs">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" id="courseSearchInput" oninput="filterCourseGrid()" placeholder="輸入課文名稱、本別代碼或日期..." class="w-full bg-[#1c1c24] border border-zinc-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/70 transition">
+                <input type="text" id="courseSearchInput" oninput="filterCourseGrid()" placeholder="輸入課文名稱或日期關鍵字..." class="w-full bg-[#1c1c24] border border-zinc-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500/70 transition">
             </div>
 
             <div id="courseModalGrid" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-1"></div>
@@ -117,9 +148,9 @@
     <header class="w-full max-w-xl z-10 flex flex-col gap-3 mt-2">
         <div class="relative bg-[#16161b] border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between shadow-lg">
             <div class="flex items-center gap-2 overflow-hidden mr-2">
-                <span class="text-xs text-amber-500/70 font-semibold tracking-wider shrink-0">當前課文：</span>
+                <span class="text-xs text-amber-500/70 font-semibold tracking-wider shrink-0">當前範疇：</span>
                 <button onclick="toggleCourseModal()" class="flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300 font-bold tracking-wide transition truncate focus:outline-none group">
-                    <span id="currentCourseTitle" class="truncate">請點擊選擇課文...</span>
+                    <span id="currentCourseTitle" class="truncate">全部成語 (總庫)</span>
                     <i class="fa-solid fa-chevron-down text-xs text-zinc-500 group-hover:text-amber-400 transition shrink-0"></i>
                 </button>
             </div>
@@ -146,7 +177,7 @@
                 <span id="cardProgressText" class="text-zinc-400 font-mono">0 / 0</span>
                 <span id="syncStatus" class="text-[11px] text-teal-400 font-mono">試算表待命</span>
                 <div class="flex items-center gap-3">
-                    <button onclick="addNewCard()" class="hover:text-amber-400 text-zinc-400 transition flex items-center gap-1 font-bold">
+                    <button onclick="openNewCardModal()" class="hover:text-amber-400 text-zinc-400 transition flex items-center gap-1 font-bold">
                         <i class="fa-solid fa-plus text-amber-500"></i> 新增卡片
                     </button>
                     <button onclick="deleteCurrentCard()" class="hover:text-red-400 text-zinc-500 transition flex items-center gap-1">
@@ -167,7 +198,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500 text-xs">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" id="searchBar" oninput="handleSearch()" placeholder="輸入 ID、成語、注音、出處..." class="w-full bg-[#17171c] border border-zinc-800 rounded-lg pl-9 pr-8 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 transition-all">
+                <input type="text" id="searchBar" oninput="handleSearch()" placeholder="全庫檢索：輸入 ID、成語、注音、出處、關鍵字..." class="w-full bg-[#17171c] border border-zinc-800 rounded-lg pl-9 pr-8 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 transition-all">
                 <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500 hover:text-zinc-300">
                     <i class="fa-solid fa-circle-xmark"></i>
                 </button>
@@ -198,26 +229,27 @@
                     <div class="absolute inset-0 opacity-[0.02] border-[12px] border-amber-600 m-4 pointer-events-none"></div>
                     
                     <div class="w-full flex justify-between items-center text-amber-500/30 text-[10px] tracking-widest font-mono">
-                        <span id="cardFrontIndex">NO. DEMO</span>
-                        <i class="fa-solid fa-feather-pointed text-sm"></i>
-                        <span>智慧宮殿系統</span>
+                        <span id="cardFrontIndex">NO. --</span>
+                        <div class="flex items-center gap-1.5">
+                            <span id="cardFrontCourseTag" class="px-2 py-0.5 rounded bg-amber-950/40 text-amber-500/80 border border-amber-900/40">課文</span>
+                        </div>
                     </div>
 
                     <div class="flex flex-col items-center gap-4 my-auto text-center">
                         <div class="w-14 h-14 rounded-full border border-amber-500/20 flex items-center justify-center mb-2 bg-amber-950/10">
-                            <i class="fa-solid fa-book-open text-amber-500/80 text-xl"></i>
+                            <i class="fa-solid fa-scroll text-amber-500/80 text-xl"></i>
                         </div>
                         <h2 id="cardFrontTitle" class="editable-field serif-title text-4xl sm:text-5xl text-amber-100 leading-snug tracking-wider" contenteditable="false" onblur="saveField('title', this)">
-                            古典智慧宮殿
+                            載入中...
                         </h2>
                         <div id="cardFrontZhuyin" class="editable-field text-amber-500/90 text-sm font-medium tracking-widest mt-1 bg-amber-950/20 px-3 py-1 rounded-full border border-amber-900/30" contenteditable="false" onblur="saveField('zhuyin', this)">
-                            點擊上方「選擇課文」開啟藏書閣
+                            ---
                         </div>
                     </div>
 
                     <div class="w-full text-center flex flex-col items-center gap-1">
                         <p id="cardFrontHint" class="text-zinc-400 text-xs tracking-widest font-medium animate-pulse">
-                            點擊卡片翻轉 · 體驗典故解析
+                            點擊卡片翻轉 · 研讀古典考據
                         </p>
                         <div class="w-8 h-[2px] bg-amber-600/40 mt-1"></div>
                     </div>
@@ -227,27 +259,29 @@
                 <div class="card-back absolute inset-0 w-full h-full rounded-2xl bg-[#131317] border border-zinc-800 flex flex-col p-5 shadow-2xl emerald-glow overflow-hidden">
                     <div class="w-full h-full overflow-y-auto pr-1.5 custom-scrollbar flex flex-col gap-4">
                         
-                        <!-- 1. 插圖區 -->
+                        <!-- 1. 插圖區（精確直讀同層 JPG） -->
                         <div class="w-full aspect-[16/10] sm:aspect-[16/9.5] rounded-xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950 shrink-0">
                             <img id="cardBackImage" src="" alt="精緻插圖" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#131317] via-transparent to-transparent"></div>
                             <span id="imageTag" class="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-mono tracking-widest bg-black/75 rounded text-teal-400 border border-teal-500/20 uppercase">
-                                FILE: DEMO
+                                FILE: --
                             </span>
                         </div>
 
                         <!-- 2. 標題與資訊 -->
                         <div class="flex items-start justify-between border-b border-zinc-800/60 pb-3 shrink-0">
                             <div class="flex-1 mr-4">
-                                <div class="text-[10px] text-amber-500 font-mono mb-1">
-                                    ID 編號：<span id="cardBackIdDisplay" class="editable-field bg-zinc-900 px-1.5 py-0.5 rounded border border-amber-900/40" contenteditable="false" onblur="saveField('id', this)">DEMO_0</span>
+                                <div class="text-[10px] text-amber-500 font-mono mb-1 flex items-center gap-2">
+                                    <span>ID：<span id="cardBackIdDisplay" class="editable-field bg-zinc-900 px-1.5 py-0.5 rounded border border-amber-900/40" contenteditable="false" onblur="saveField('id', this)"></span></span>
+                                    <span class="text-zinc-600">|</span>
+                                    <span>課文：<span id="cardBackCourseDisplay" class="editable-field text-zinc-400" contenteditable="false" onblur="saveField('course', this)"></span></span>
                                 </div>
-                                <h3 id="cardBackTitle" class="editable-field serif-title text-2xl text-zinc-100 tracking-wider" contenteditable="false" onblur="saveField('title', this)">範例字卡</h3>
+                                <h3 id="cardBackTitle" class="editable-field serif-title text-2xl text-zinc-100 tracking-wider" contenteditable="false" onblur="saveField('title', this)">載入中</h3>
                                 
                                 <div class="flex flex-wrap items-center gap-2 mt-1">
-                                    <span id="cardBackZhuyin" class="editable-field text-xs text-amber-500 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)">ㄈㄢˋ ㄌㄧˋ</span>
+                                    <span id="cardBackZhuyin" class="editable-field text-xs text-amber-500 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)"></span>
                                     <span class="text-zinc-600 text-xs">|</span>
-                                    <span id="cardBackSource" class="editable-field text-xs text-zinc-400 font-medium" contenteditable="false" onblur="saveField('source', this)">系統指引</span>
+                                    <span id="cardBackSource" class="editable-field text-xs text-zinc-400 font-medium" contenteditable="false" onblur="saveField('source', this)"></span>
                                 </div>
 
                                 <div id="cardBackKeywords" class="mt-2">
@@ -269,7 +303,7 @@
                         <div class="border-l-2 border-teal-500 pl-3 py-1 shrink-0">
                             <span class="text-[10px] text-teal-500 uppercase font-mono tracking-wider font-bold block">釋義與用途</span>
                             <p id="cardBackMeaning" class="editable-field text-xs sm:text-sm font-medium text-zinc-300 tracking-wide mt-1 leading-relaxed" contenteditable="false" onblur="saveField('meaning', this)">
-                                歡迎來到智慧宮殿系統。本系統已依據日期進行自動降序排序，最新建立的課本與字卡將自動呈現在藏書閣的最前列。
+                                讀取中...
                             </p>
                         </div>
 
@@ -277,7 +311,7 @@
                         <div class="bg-zinc-900/30 border border-zinc-800/40 px-4 py-3 rounded-xl shrink-0">
                             <span class="text-[10px] text-amber-500/70 font-bold tracking-widest block mb-1">【造句範例】</span>
                             <p id="cardBackSentence" class="editable-field text-zinc-300 text-xs italic leading-relaxed tracking-wide" contenteditable="false" onblur="saveField('sentence', this)">
-                                點擊「開啟編輯」即可隨心修改文字，並自動回傳雲端試算表記錄。
+                                讀取中...
                             </p>
                         </div>
 
@@ -287,7 +321,7 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>【古典歷史考據 · 故事這樣講】
                             </h4>
                             <p id="cardBackStory" class="editable-field text-zinc-300 text-xs leading-relaxed tracking-wide text-justify whitespace-pre-line" contenteditable="false" onblur="saveField('story', this)">
-                                系統結合 Google 試算表雲端資料庫與本地圖檔快取架構。支援 A/B/C 課文分組，每本課文流水號獨立從 1 開始（如 20260906_A_1.jpg）。
+                                讀取中...
                             </p>
                         </div>
                     </div>
@@ -325,31 +359,17 @@
         const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEtz5ifxuJjLi0xT9zJIu292hlQ068lgLp3vCLggyYxun0Z0Y5S8ZOwG8gTbBP8kW8KbvOxKvQhLTk/pub?output=csv";
         const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJWQh9F7rQ1UVKU-TiujGmLUWVUWGQ4lzRmJh3KisdJ1ypT7JWdX1UxCRzZZXvA5Du/exec"; 
 
-        let allCourses = {}; 
-        let courseLetterMap = {}; 
-        let currentCourseName = ""; 
-        let currentCourseCards = [];
+        let allMasterCards = [];
+        let allCourseCategories = [];
+        let selectedCourseFilter = "ALL";
+
         let currentIndex = 0;
         let isFlipped = false;
-        let currentFilter = "all";
+        let currentStatusFilter = "all";
         let searchQuery = "";
         let isEditMode = false;
 
-        const DEMO_CARD = {
-            course: "系統導引",
-            id: "DEMO",
-            title: "智慧宮殿",
-            zhuyin: "ㄓˋ ㄏㄨㄟˋ ㄍㄨㄥ ㄉㄧㄢˋ",
-            source: "使用指引",
-            keywords: "導引 典故 成語 試算表",
-            meaning: "歡迎來到古典思維成語字卡系統。請由上方「選擇課文」挑選您要溫習的單元。",
-            sentence: "點擊卡片翻面，開啟編輯模式即可直接編輯並即時同步回雲端試算表。",
-            story: "這是一張初始範例卡片。當您選取任何具體課文後，系統將自動為您呈現該課程的所有字卡。",
-            music_url: "",
-            historyCount: "0"
-        };
-
-        let progress = JSON.parse(localStorage.getItem("palace_sheets_progress")) || {};
+        let progress = JSON.parse(localStorage.getItem("palace_sheets_progress_v2")) || { review: [], mastered: [] };
 
         const cardInner = document.getElementById("cardInner");
         const searchBar = document.getElementById("searchBar");
@@ -361,6 +381,16 @@
         const galleryDrawer = document.getElementById("galleryDrawer");
         const galleryGridContainer = document.getElementById("galleryGridContainer");
         const syncStatus = document.getElementById("syncStatus");
+
+        const newCardModal = document.getElementById("newCardModal");
+        const newCardCourseInput = document.getElementById("newCardCourseInput");
+        const newCardIdInput = document.getElementById("newCardIdInput");
+        const newCardTitleInput = document.getElementById("newCardTitleInput");
+        const newCardFilePreview = document.getElementById("newCardFilePreview");
+
+        newCardIdInput.addEventListener("input", (e) => {
+            newCardFilePreview.innerText = `${e.target.value.trim() || '--'}.jpg`;
+        });
 
         function showCustomModal(title, message, isConfirm, onConfirmCallback) {
             const modal = document.getElementById("customModal");
@@ -401,55 +431,50 @@
             }
         }
 
-        // 從文字或字卡中提取最高日期的輔助函式 (例如從 20260906_國文成語 取得 20260906)
-        function extractDateValue(courseName) {
-            const match = courseName.match(/\d{8}/);
-            if (match) return parseInt(match[0], 10);
-            
-            // 若名稱無日期，從底下的卡片中找出最大的日期
-            const cards = allCourses[courseName] || [];
-            let maxD = 0;
-            cards.forEach(c => {
-                const cMatch = (c.id || "").match(/\d{8}/);
-                if (cMatch) {
-                    const d = parseInt(cMatch[0], 10);
-                    if (d > maxD) maxD = d;
-                }
-            });
-            return maxD;
+        function extractDateValue(str) {
+            const match = (str || "").match(/\d{8}/);
+            return match ? parseInt(match[0], 10) : 0;
         }
 
-        // 搜尋並彩現藏書閣清單（依照日期降序排列）
         function filterCourseGrid() {
             const query = (courseSearchInput.value || "").toLowerCase().trim();
-            const keys = Object.keys(allCourses);
-
-            // 核心演算法：由新到舊排序 (日期數值大者在前)
-            keys.sort((a, b) => {
-                const dateA = extractDateValue(a);
-                const dateB = extractDateValue(b);
-                if (dateB !== dateA) return dateB - dateA;
-                return a.localeCompare(b);
-            });
-
             courseModalGrid.innerHTML = "";
 
-            const matchedKeys = keys.filter(name => {
-                const letter = (courseLetterMap[name] || "").toLowerCase();
-                return name.toLowerCase().includes(query) || letter.includes(query);
-            });
+            // 全部成語選項
+            const allBtn = document.createElement("button");
+            const isAllSelected = (selectedCourseFilter === "ALL");
+            allBtn.className = `p-3 rounded-xl border text-left flex items-center justify-between transition group col-span-full ${
+                isAllSelected 
+                ? 'border-amber-500 bg-amber-950/30 shadow-lg gold-glow' 
+                : 'border-zinc-800 bg-[#16161d] hover:border-amber-500/50 hover:bg-zinc-800/40'
+            }`;
+            allBtn.onclick = () => {
+                selectCourseFilter("ALL");
+                toggleCourseModal();
+            };
+            allBtn.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-lg bg-teal-950/40 border border-teal-600/40 text-teal-400 text-xs font-bold flex items-center justify-center">
+                        <i class="fa-solid fa-globe"></i>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-100 group-hover:text-amber-300 transition">★ 全部成語 (總庫檢索)</h4>
+                        <span class="text-[10px] text-zinc-500">不限單元，全庫跨課溫習</span>
+                    </div>
+                </div>
+                <span class="text-[10px] font-mono text-teal-400 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
+                    共 ${allMasterCards.length} 筆
+                </span>
+            `;
+            courseModalGrid.appendChild(allBtn);
 
-            document.getElementById("courseCountTag").innerText = `共 ${matchedKeys.length} / ${keys.length} 冊`;
+            // 各課文單元選項
+            const matchedCourses = allCourseCategories.filter(c => c.toLowerCase().includes(query));
+            document.getElementById("courseCountTag").innerText = `共 ${allCourseCategories.length} 個課文單元`;
 
-            if (matchedKeys.length === 0) {
-                courseModalGrid.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-zinc-500">查無符合的課文典籍</div>`;
-                return;
-            }
-
-            matchedKeys.forEach(name => {
-                const letter = courseLetterMap[name] || "A";
-                const count = allCourses[name].length;
-                const isSelected = (currentCourseName === name);
+            matchedCourses.forEach(cName => {
+                const isSelected = (selectedCourseFilter === cName);
+                const count = allMasterCards.filter(card => card.course === cName).length;
 
                 const item = document.createElement("button");
                 item.className = `p-3 rounded-xl border text-left flex items-center justify-between transition group ${
@@ -457,21 +482,14 @@
                     ? 'border-amber-500 bg-amber-950/30 shadow-lg gold-glow' 
                     : 'border-zinc-800 bg-[#16161d] hover:border-amber-500/50 hover:bg-zinc-800/40'
                 }`;
-
                 item.onclick = () => {
-                    loadCourse(name);
+                    selectCourseFilter(cName);
                     toggleCourseModal();
                 };
-
                 item.innerHTML = `
-                    <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                        <span class="w-7 h-7 rounded-lg bg-amber-950/40 border border-amber-600/40 text-amber-400 font-mono text-xs font-bold flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-                            ${letter}
-                        </span>
-                        <div class="truncate">
-                            <h4 class="text-xs font-bold text-zinc-200 group-hover:text-amber-300 transition truncate">${name}</h4>
-                            <span class="text-[10px] text-zinc-500">第 ${letter} 本典籍</span>
-                        </div>
+                    <div class="truncate pr-2">
+                        <h4 class="text-xs font-bold text-zinc-200 group-hover:text-amber-300 transition truncate">${cName}</h4>
+                        <span class="text-[10px] text-zinc-500">單元課文</span>
                     </div>
                     <span class="text-[10px] font-mono text-zinc-400 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 shrink-0">
                         ${count} 張
@@ -479,6 +497,17 @@
                 `;
                 courseModalGrid.appendChild(item);
             });
+        }
+
+        function selectCourseFilter(courseName) {
+            selectedCourseFilter = courseName;
+            currentCourseTitle.innerText = (courseName === "ALL") ? "★ 全部成語 (總庫)" : `單元：${courseName}`;
+            currentIndex = 0;
+            isFlipped = false;
+            cardInner.classList.remove("is-flipped");
+            clearSearch();
+            updateFiltersCount();
+            renderCard();
         }
 
         function parseCSV(text) {
@@ -506,7 +535,7 @@
         }
 
         async function reloadFromSheets() {
-            syncStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 載入中...';
+            syncStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 同步中...';
             try {
                 const res = await fetch(SHEETS_CSV_URL + "&t=" + Date.now());
                 const csvText = await res.text();
@@ -514,21 +543,19 @@
                 
                 if (rows.length <= 1) throw new Error("試算表內無資料");
 
-                allCourses = {};
-                courseLetterMap = {};
+                allMasterCards = [];
+                const courseSet = new Set();
 
                 for (let i = 1; i < rows.length; i++) {
                     const r = rows[i];
-                    const courseCategory = (r[0] && r[0].trim() !== "") ? r[0].trim() : "未分類課文";
                     if ((!r[0] || r[0].trim() === "") && (!r[1] || r[1].trim() === "")) continue;
 
-                    if (!allCourses[courseCategory]) {
-                        allCourses[courseCategory] = [];
-                    }
+                    const courseTag = (r[0] && r[0].trim() !== "") ? r[0].trim() : "一般成語";
+                    courseSet.add(courseTag);
 
-                    allCourses[courseCategory].push({
-                        course: courseCategory,
-                        id: r[1] ? r[1].trim() : `20260906_A_${i}`,
+                    allMasterCards.push({
+                        course: courseTag,
+                        id: r[1] ? r[1].trim() : `20260906_${i}`,
                         title: r[2] ? r[2].trim() : "",
                         zhuyin: r[3] ? r[3].trim() : "",
                         source: r[4] ? r[4].trim() : "",
@@ -541,47 +568,19 @@
                     });
                 }
 
-                // 課文抓完後，統一依照日期降序指派 A、B、C 字母
-                const sortedKeys = Object.keys(allCourses).sort((a, b) => {
+                allCourseCategories = Array.from(courseSet).sort((a, b) => {
                     const dateA = extractDateValue(a);
                     const dateB = extractDateValue(b);
                     if (dateB !== dateA) return dateB - dateA;
                     return a.localeCompare(b);
                 });
 
-                sortedKeys.forEach((name, idx) => {
-                    courseLetterMap[name] = String.fromCharCode(65 + (idx % 26));
-                });
-
-                if (currentCourseName && allCourses[currentCourseName]) {
-                    loadCourse(currentCourseName);
-                } else {
-                    currentCourseCards = [DEMO_CARD];
-                    renderCard();
-                }
-
+                selectCourseFilter(selectedCourseFilter);
                 syncStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> 同步完成';
             } catch (err) {
                 syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i> 連線失敗';
-                showCustomModal("同步失敗", "無法自 Google 試算表取得資料，請檢查網路或試算表共用狀態。", false);
+                showCustomModal("同步失敗", "無法自 Google 試算表取得資料，請檢查網路或發布設定。", false);
             }
-        }
-
-        function loadCourse(courseName) {
-            currentCourseName = courseName;
-            const letter = courseLetterMap[courseName] || "A";
-            currentCourseTitle.innerText = `[第${letter}本] ${courseName}`;
-            currentIndex = 0;
-            isFlipped = false;
-            cardInner.classList.remove("is-flipped");
-            clearSearch();
-
-            // 課文內的卡片亦可保持新到舊或原本順序
-            currentCourseCards = allCourses[courseName] || [];
-            if (!progress[courseName]) progress[courseName] = { review: [], mastered: [] };
-
-            updateFiltersCount();
-            renderCard();
         }
 
         function toggleGalleryDrawer() {
@@ -595,12 +594,6 @@
         }
 
         function bindJpgImage(imgElement, id, tagElement) {
-            if (id === "DEMO") {
-                imgElement.src = 'https://placehold.co/600x450/16161c/e4e4e7?text=%E6%99%BA%E6%85%A7%E5%AE%AE%E6%AE%BF%E7%AF%84%E4%BE%8B';
-                if (tagElement) tagElement.innerText = `FILE: DEMO`;
-                return;
-            }
-
             const lowerSrc = `${id}.jpg`;
             const upperSrc = `${id}.JPG`;
             
@@ -619,14 +612,13 @@
 
         function renderGalleryGrid() {
             galleryGridContainer.innerHTML = "";
-            const filtered = getFilteredCards();
-            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
-            document.getElementById("galleryCountTag").innerText = `共 ${filtered.length} 張字卡`;
+            const filtered = getActiveCards();
+            document.getElementById("galleryCountTag").innerText = `當前篩選：共 ${filtered.length} 張字卡`;
 
             filtered.forEach((card, idx) => {
                 const item = document.createElement("div");
-                const isReview = courseProg.review.includes(card.id);
-                const isMastered = courseProg.mastered.includes(card.id);
+                const isReview = progress.review.includes(card.id);
+                const isMastered = progress.mastered.includes(card.id);
 
                 let badge = "";
                 if (isMastered) badge = '<span class="w-2 h-2 rounded-full bg-teal-400"></span>';
@@ -647,8 +639,8 @@
                         <div class="absolute top-1.5 right-1.5">${badge}</div>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-zinc-200 group-hover:text-amber-400 transition">${card.title || '無名稱'}</span>
-                        <span class="text-[9px] font-mono text-zinc-500">#${idx + 1}</span>
+                        <span class="text-xs font-bold text-zinc-200 group-hover:text-amber-400 transition truncate mr-1">${card.title || '無名稱'}</span>
+                        <span class="text-[9px] font-mono text-zinc-500 shrink-0">#${idx + 1}</span>
                     </div>
                 `;
                 galleryGridContainer.appendChild(item);
@@ -659,10 +651,6 @@
         }
 
         function toggleEditMode() {
-            if (!currentCourseName) {
-                showCustomModal("提示", "請先於上方選取具體課文後，再開啟編輯模式。", false);
-                return;
-            }
             isEditMode = !isEditMode;
             const btn = document.getElementById("editModeBtn");
             const btnText = document.getElementById("editModeBtnText");
@@ -676,7 +664,7 @@
                 keywordsInputWrapper.classList.remove("hidden");
                 keywordsPillsContainer.classList.add("hidden");
                 
-                const filtered = getFilteredCards();
+                const filtered = getActiveCards();
                 if (filtered.length > 0) {
                     document.getElementById("cardBackKeywordsInput").value = filtered[currentIndex].keywords || "";
                 }
@@ -698,8 +686,8 @@
         }
 
         async function saveField(field, element) {
-            if (!isEditMode || !currentCourseName) return;
-            const filtered = getFilteredCards();
+            if (!isEditMode) return;
+            const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
             const newValue = element.innerText.trim();
@@ -714,6 +702,8 @@
             } else if (field === 'id') {
                 document.getElementById("cardFrontIndex").innerText = `NO. ${newValue}`;
                 renderCard();
+            } else if (field === 'course') {
+                document.getElementById("cardFrontCourseTag").innerText = newValue;
             }
 
             if (APPS_SCRIPT_WEBAPP_URL) {
@@ -734,7 +724,7 @@
 
         function saveKeywordsInput(element) {
             if (!isEditMode) return;
-            const filtered = getFilteredCards();
+            const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
             card.keywords = element.value.trim();
@@ -742,20 +732,15 @@
             saveField('keywords', { innerText: card.keywords });
         }
 
-        function getNextCourseId() {
+        function getNextGlobalDailyId() {
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            const dateStr = `${year}${month}${day}`;
-            
-            const letter = courseLetterMap[currentCourseName] || "A";
-            const prefix = `${dateStr}_${letter}_`;
+            const prefix = `${year}${month}${day}_`;
 
             let maxNum = 0;
-            const cardsInThisCourse = allCourses[currentCourseName] || [];
-            
-            cardsInThisCourse.forEach(card => {
+            allMasterCards.forEach(card => {
                 if (card.id && card.id.startsWith(prefix)) {
                     const numPart = parseInt(card.id.replace(prefix, ""), 10);
                     if (!isNaN(numPart) && numPart > maxNum) {
@@ -767,19 +752,34 @@
             return `${prefix}${maxNum + 1}`;
         }
 
-        function addNewCard() {
-            if (!currentCourseName) {
-                showCustomModal("提示", "請先由上方選取課文單元！", false);
-                return;
-            }
+        function openNewCardModal() {
+            const autoId = getNextGlobalDailyId();
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const defaultCourseName = `${y}${m}${d}_國文成語`;
 
-            const newId = getNextCourseId();
-            const letter = courseLetterMap[currentCourseName] || "A";
-            
+            newCardCourseInput.value = (selectedCourseFilter === "ALL") ? defaultCourseName : selectedCourseFilter;
+            newCardIdInput.value = autoId;
+            newCardTitleInput.value = "新成語名稱";
+            newCardFilePreview.innerText = `${autoId}.jpg`;
+            newCardModal.classList.remove("hidden");
+        }
+
+        function closeNewCardModal() {
+            newCardModal.classList.add("hidden");
+        }
+
+        function confirmAddNewCard() {
+            const customCourse = newCardCourseInput.value.trim() || "預設成語單元";
+            const customId = newCardIdInput.value.trim() || getNextGlobalDailyId();
+            const customTitle = newCardTitleInput.value.trim() || "新成語名稱";
+
             const newCard = {
-                course: currentCourseName,
-                id: newId,
-                title: "新成語名稱",
+                course: customCourse,
+                id: customId,
+                title: customTitle,
                 zhuyin: "ㄓㄨˋ ㄧㄣ",
                 source: "出處考據",
                 keywords: "標籤 關鍵字",
@@ -790,38 +790,38 @@
                 historyCount: "0"
             };
 
-            currentCourseCards.push(newCard);
-            allCourses[currentCourseName] = currentCourseCards;
-            
-            currentIndex = currentCourseCards.length - 1;
+            allMasterCards.unshift(newCard);
+            if (!allCourseCategories.includes(customCourse)) {
+                allCourseCategories.unshift(customCourse);
+            }
+
+            closeNewCardModal();
+            currentIndex = 0;
             updateFiltersCount();
             renderCard();
-            showCustomModal("新增成功", `已為【第 ${letter} 本】建立字卡【${newId}】！\n同層圖檔請命名為：${newId}.jpg`, false);
+
+            showCustomModal("建立成功", `已新增字卡【${customTitle} (${customId})】！\n同層圖檔請命名為：${customId}.jpg`, false);
 
             if (APPS_SCRIPT_WEBAPP_URL) {
-                saveField('id', { innerText: newId });
+                saveField('id', { innerText: customId });
             }
         }
 
         function deleteCurrentCard() {
-            if (!currentCourseName || currentCourseCards.length === 0) {
+            const activeCards = getActiveCards();
+            if (activeCards.length === 0) {
                 showCustomModal("提示", "目前尚無可刪除的字卡。", false);
                 return;
             }
 
-            const card = currentCourseCards[currentIndex];
-            if (card.id === "DEMO") {
-                showCustomModal("提示", "系統範例卡片無法刪除。", false);
-                return;
-            }
+            const card = activeCards[currentIndex];
 
-            showCustomModal("確認刪除", `您確定要永久刪除【${card.title} (${card.id})】嗎？\n試算表中的對應記錄也將同步移除。`, true, async () => {
+            showCustomModal("確認刪除", `您確定要永久刪除【${card.title} (${card.id})】嗎？\n雲端試算表中也將同步移除。`, true, async () => {
                 const deletedId = card.id;
                 
-                currentCourseCards.splice(currentIndex, 1);
-                allCourses[currentCourseName] = currentCourseCards;
-                if (currentIndex >= currentCourseCards.length) {
-                    currentIndex = Math.max(0, currentCourseCards.length - 1);
+                allMasterCards = allMasterCards.filter(c => c.id !== deletedId);
+                if (currentIndex >= getActiveCards().length) {
+                    currentIndex = Math.max(0, getActiveCards().length - 1);
                 }
                 
                 updateFiltersCount();
@@ -838,26 +838,30 @@
                         });
                         syncStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> 刪除完畢';
                     } catch (e) {
-                        syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> 雲端刪除失敗';
+                        syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> 刪除失敗';
                     }
                 }
             });
         }
 
-        function getFilteredCards() {
-            let cards = [...currentCourseCards];
-            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
-            
-            if (currentFilter === "review") {
-                cards = cards.filter(card => courseProg.review.includes(card.id));
-            } else if (currentFilter === "mastered") {
-                cards = cards.filter(card => courseProg.mastered.includes(card.id));
+        function getActiveCards() {
+            let cards = [...allMasterCards];
+
+            if (selectedCourseFilter !== "ALL") {
+                cards = cards.filter(card => card.course === selectedCourseFilter);
+            }
+
+            if (currentStatusFilter === "review") {
+                cards = cards.filter(card => progress.review.includes(card.id));
+            } else if (currentStatusFilter === "mastered") {
+                cards = cards.filter(card => progress.mastered.includes(card.id));
             }
 
             if (searchQuery.trim() !== "") {
                 const query = searchQuery.toLowerCase().trim();
                 cards = cards.filter(card => 
                     (card.id && card.id.toLowerCase().includes(query)) ||
+                    (card.course && card.course.toLowerCase().includes(query)) ||
                     (card.title && card.title.toLowerCase().includes(query)) || 
                     (card.meaning && card.meaning.toLowerCase().includes(query)) || 
                     (card.story && card.story.toLowerCase().includes(query)) || 
@@ -887,16 +891,17 @@
         }
 
         function renderCard() {
-            const filtered = getFilteredCards();
+            const filtered = getActiveCards();
             
             if (filtered.length === 0) {
-                document.getElementById("cardFrontTitle").innerText = "尚無字卡";
+                document.getElementById("cardFrontTitle").innerText = "無相符成語";
                 document.getElementById("cardFrontZhuyin").innerText = "---";
                 document.getElementById("cardFrontIndex").innerText = "NO. --";
+                document.getElementById("cardFrontCourseTag").innerText = "無";
                 document.getElementById("cardBackTitle").innerText = "空無一物";
                 document.getElementById("cardBackZhuyin").innerText = "";
                 document.getElementById("cardBackSource").innerText = "";
-                document.getElementById("cardBackMeaning").innerText = "此課文內尚無字卡，可點擊上方「新增卡片」建立。";
+                document.getElementById("cardBackMeaning").innerText = "當前課文或搜尋條件下查無任何字卡。";
                 document.getElementById("cardBackSentence").innerText = "";
                 document.getElementById("cardBackStory").innerText = "";
                 document.getElementById("cardProgressText").innerText = "0 / 0";
@@ -912,12 +917,14 @@
             document.getElementById("cardFrontTitle").innerText = card.title || "";
             document.getElementById("cardFrontZhuyin").innerText = card.zhuyin || "";
             document.getElementById("cardFrontIndex").innerText = `NO. ${card.id || '---'}`;
+            document.getElementById("cardFrontCourseTag").innerText = card.course || "成語";
 
             const backImg = document.getElementById("cardBackImage");
             const tagEl = document.getElementById("imageTag");
             bindJpgImage(backImg, card.id, tagEl);
 
             document.getElementById("cardBackIdDisplay").innerText = card.id || "";
+            document.getElementById("cardBackCourseDisplay").innerText = card.course || "";
             document.getElementById("cardBackTitle").innerText = card.title || "";
             document.getElementById("cardBackZhuyin").innerText = card.zhuyin || "";
             document.getElementById("cardBackSource").innerText = card.source || "";
@@ -958,9 +965,8 @@
         }
 
         function updateButtonStyles(cardId) {
-            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
-            const isReview = courseProg.review.includes(cardId);
-            const isMastered = courseProg.mastered.includes(cardId);
+            const isReview = progress.review.includes(cardId);
+            const isMastered = progress.mastered.includes(cardId);
 
             const reviewBtn = document.querySelector("button[onclick=\"markCard('review')\"]");
             const masteredBtn = document.querySelector("button[onclick=\"markCard('mastered')\"]");
@@ -980,13 +986,13 @@
         }
 
         function nextCard() {
-            const filtered = getFilteredCards(); if (filtered.length <= 1) return;
+            const filtered = getActiveCards(); if (filtered.length <= 1) return;
             isFlipped = false; cardInner.classList.remove("is-flipped");
             setTimeout(() => { currentIndex = (currentIndex + 1) % filtered.length; renderCard(); }, 150);
         }
 
         function prevCard() {
-            const filtered = getFilteredCards(); if (filtered.length <= 1) return;
+            const filtered = getActiveCards(); if (filtered.length <= 1) return;
             isFlipped = false; cardInner.classList.remove("is-flipped");
             setTimeout(() => { currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; renderCard(); }, 150);
         }
@@ -999,42 +1005,40 @@
         });
 
         function markCard(status) {
-            const filtered = getFilteredCards(); if (filtered.length === 0) return;
+            const filtered = getActiveCards(); if (filtered.length === 0) return;
             const cardId = filtered[currentIndex].id;
-            if (cardId === "DEMO") return;
-            let courseProg = progress[currentCourseName];
 
             if (status === "review") {
-                const index = courseProg.review.indexOf(cardId);
-                if (index > -1) { courseProg.review.splice(index, 1); } 
-                else { courseProg.review.push(cardId); const mIndex = courseProg.mastered.indexOf(cardId); if (mIndex > -1) courseProg.mastered.splice(mIndex, 1); }
+                const index = progress.review.indexOf(cardId);
+                if (index > -1) { progress.review.splice(index, 1); } 
+                else { progress.review.push(cardId); const mIndex = progress.mastered.indexOf(cardId); if (mIndex > -1) progress.mastered.splice(mIndex, 1); }
             } else if (status === "mastered") {
-                const index = courseProg.mastered.indexOf(cardId);
-                if (index > -1) { courseProg.mastered.splice(index, 1); } 
-                else { courseProg.mastered.push(cardId); const rIndex = courseProg.review.indexOf(cardId); if (rIndex > -1) courseProg.review.splice(rIndex, 1); }
+                const index = progress.mastered.indexOf(cardId);
+                if (index > -1) { progress.mastered.splice(index, 1); } 
+                else { progress.mastered.push(cardId); const rIndex = progress.review.indexOf(cardId); if (rIndex > -1) progress.review.splice(rIndex, 1); }
             }
 
-            localStorage.setItem("palace_sheets_progress", JSON.stringify(progress));
+            localStorage.setItem("palace_sheets_progress_v2", JSON.stringify(progress));
             updateFiltersCount();
             renderCard();
         }
 
         function updateFiltersCount() {
-            if (!currentCourseName) {
-                document.getElementById("count-all").innerText = "0";
-                document.getElementById("count-review").innerText = "0";
-                document.getElementById("count-mastered").innerText = "0";
-                return;
-            }
-            const allCards = currentCourseCards;
-            const courseProg = progress[currentCourseName] || { review: [], mastered: [] };
-            document.getElementById("count-all").innerText = allCards.length;
-            document.getElementById("count-review").innerText = courseProg.review.length;
-            document.getElementById("count-mastered").innerText = courseProg.mastered.length;
+            const baseCards = (selectedCourseFilter === "ALL") 
+                ? allMasterCards 
+                : allMasterCards.filter(c => c.course === selectedCourseFilter);
+
+            const activeIds = baseCards.map(c => c.id);
+            const reviewCount = progress.review.filter(id => activeIds.includes(id)).length;
+            const masteredCount = progress.mastered.filter(id => activeIds.includes(id)).length;
+
+            document.getElementById("count-all").innerText = baseCards.length;
+            document.getElementById("count-review").innerText = reviewCount;
+            document.getElementById("count-mastered").innerText = masteredCount;
         }
 
         function setFilter(filterType) {
-            currentFilter = filterType; currentIndex = 0; isFlipped = false; cardInner.classList.remove("is-flipped");
+            currentStatusFilter = filterType; currentIndex = 0; isFlipped = false; cardInner.classList.remove("is-flipped");
             ["all", "review", "mastered"].forEach(type => {
                 const btn = document.getElementById(`filter-${type}`);
                 btn.className = (type === filterType)
@@ -1046,7 +1050,7 @@
 
         function speakText(event) {
             event.stopPropagation();
-            const filtered = getFilteredCards(); if (filtered.length === 0) return;
+            const filtered = getActiveCards(); if (filtered.length === 0) return;
             const card = filtered[currentIndex];
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -1058,10 +1062,9 @@
         }
 
         function triggerResetProgress() {
-            if (!currentCourseName) return;
-            showCustomModal("重置進度", `您確定要清空當前【${currentCourseName}】的待思索與已內化標記嗎？`, true, () => {
-                progress[currentCourseName] = { review: [], mastered: [] };
-                localStorage.setItem("palace_sheets_progress", JSON.stringify(progress));
+            showCustomModal("重置進度", `您確定要重置當前範圍內的待思索與已內化標記嗎？`, true, () => {
+                progress = { review: [], mastered: [] };
+                localStorage.setItem("palace_sheets_progress_v2", JSON.stringify(progress));
                 updateFiltersCount();
                 renderCard();
             });
