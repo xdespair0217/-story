@@ -46,7 +46,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 md:p-8 overflow-x-hidden relative">
+<body class="min-h-screen flex flex-col items-center justify-start p-3 sm:p-5 md:p-6 overflow-x-hidden relative">
 
     <!-- 柔和環境光暈 -->
     <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -202,8 +202,8 @@
         </div>
     </div>
 
-    <!-- 頂部導覽列（手機端雙層優化，保證課名不截斷） -->
-    <header class="w-full max-w-2xl z-10 flex flex-col gap-2.5 mt-0.5 sm:mt-2">
+    <!-- 頂部導覽列 -->
+    <header class="w-full max-w-3xl z-10 flex flex-col gap-2.5">
         <div class="bg-[#16161b] border border-zinc-800 rounded-2xl p-3 sm:px-4 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xl">
             <!-- 課文切換按鈕區 -->
             <div class="flex items-center justify-between sm:justify-start gap-2 overflow-hidden w-full sm:w-auto">
@@ -280,13 +280,13 @@
         </div>
     </header>
 
-    <!-- 主體：3D 翻轉卡片（手機端徹底解除硬性高度封鎖，讓內容自由延伸） -->
-    <main class="w-full max-w-2xl my-3 sm:my-5 flex-1 flex flex-col items-center justify-center z-10">
-        <div class="card-perspective w-full h-[520px] sm:h-[620px] cursor-pointer" onclick="handleCardContainerClick(event)">
+    <!-- 主體：3D 翻轉卡片（優化：解除硬性高度封鎖，讓電腦與手機自然延伸撐滿，消滅橘框過大空白） -->
+    <main class="w-full max-w-3xl my-3 sm:my-4 flex-1 flex flex-col items-center justify-center z-10">
+        <div class="card-perspective w-full min-h-[460px] sm:min-h-[580px] cursor-pointer" onclick="handleCardContainerClick(event)">
             <div id="cardInner" class="card-inner w-full h-full relative rounded-3xl shadow-2xl duration-700">
                 
                 <!-- 卡片正面 -->
-                <div class="card-front absolute inset-0 w-full h-full rounded-3xl bg-[#16161c] border border-zinc-800 flex flex-col justify-between p-6 sm:p-10 shadow-2xl gold-glow overflow-hidden">
+                <div class="card-front absolute inset-0 w-full h-full min-h-[460px] sm:min-h-[580px] rounded-3xl bg-[#16161c] border border-zinc-800 flex flex-col justify-between p-6 sm:p-10 shadow-2xl gold-glow overflow-hidden">
                     <div class="absolute inset-0 opacity-[0.025] border-[12px] sm:border-[16px] border-amber-600 m-3 sm:m-4 pointer-events-none rounded-2xl"></div>
                     
                     <div class="w-full flex justify-between items-center text-amber-500/40 text-[11px] font-mono">
@@ -297,14 +297,14 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center gap-4 my-auto text-center">
-                        <div class="w-14 h-14 sm:w-18 sm:h-18 rounded-full border border-amber-500/20 flex items-center justify-center mb-1 bg-amber-950/20 shadow-inner">
-                            <i id="cardFrontCenterIcon" class="fa-solid fa-scroll text-amber-500/80 text-xl sm:text-2xl"></i>
+                    <div class="flex flex-col items-center gap-4 my-auto text-center py-6">
+                        <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border border-amber-500/20 flex items-center justify-center mb-1 bg-amber-950/20 shadow-inner">
+                            <i id="cardFrontCenterIcon" class="fa-solid fa-scroll text-amber-500/80 text-xl sm:text-3xl"></i>
                         </div>
                         <h2 id="cardFrontTitle" class="editable-field serif-title text-4xl sm:text-6xl text-amber-100 leading-snug tracking-wider drop-shadow-md" contenteditable="false" onblur="saveField('title', this)">
                             智慧宮殿
                         </h2>
-                        <div id="cardFrontZhuyin" class="editable-field text-amber-400 text-xs sm:text-base font-medium tracking-widest bg-amber-950/30 px-4 py-1 rounded-full border border-amber-800/40" contenteditable="false" onblur="saveField('zhuyin', this)">
+                        <div id="cardFrontZhuyin" class="editable-field text-amber-400 text-xs sm:text-base font-medium tracking-widest bg-amber-950/30 px-4 py-1.5 rounded-full border border-amber-800/40" contenteditable="false" onblur="saveField('zhuyin', this)">
                             點擊上方「選擇課文」開啟藏書閣
                         </div>
                     </div>
@@ -317,12 +317,12 @@
                     </div>
                 </div>
 
-                <!-- 卡片背面（高度全面解放，超出版面可平順滾動，內容絕不被腰斬） -->
-                <div class="card-back absolute inset-0 w-full h-full rounded-3xl bg-[#131317] border border-zinc-800 flex flex-col p-4 sm:p-6 shadow-2xl emerald-glow overflow-hidden">
+                <!-- 卡片背面（優化：放大圖片高度，隨內容自由呈現） -->
+                <div class="card-back absolute inset-0 w-full h-full min-h-[460px] sm:min-h-[580px] rounded-3xl bg-[#131317] border border-zinc-800 flex flex-col p-4 sm:p-6 shadow-2xl emerald-glow overflow-hidden">
                     <div class="w-full h-full overflow-y-auto pr-1.5 custom-scrollbar flex flex-col gap-3.5 sm:gap-4">
                         
-                        <!-- 1. 插圖區（手機端設定黃金緊湊視野，不佔過多垂直空間） -->
-                        <div class="w-full h-44 sm:h-56 rounded-2xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950 shrink-0 group cursor-zoom-in" onclick="openImageLightbox(event)">
+                        <!-- 1. 插圖區（優化：電腦端高度提升至 340px，整體大器壯觀） -->
+                        <div class="w-full h-48 sm:h-[340px] rounded-2xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950 shrink-0 group cursor-zoom-in" onclick="openImageLightbox(event)">
                             <img id="cardBackImage" src="https://placehold.co/800x450/141418/e4e4e7?text=%E6%99%BA%E6%85%A7%E5%AE%AE%E6%AE%BF%C2%B7%E9%96%8B%E5%95%9F%E8%97%8F%E6%9B%B8%E9%96%A3" alt="插圖" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#131317] via-transparent to-transparent pointer-events-none"></div>
                             <span id="imageTag" class="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-mono tracking-widest bg-black/80 rounded text-teal-400 border border-teal-500/30 uppercase pointer-events-none">
@@ -344,7 +344,7 @@
                                 <h3 id="cardBackTitle" class="editable-field serif-title text-xl sm:text-3xl text-zinc-100 tracking-wider" contenteditable="false" onblur="saveField('title', this)">智慧宮殿</h3>
                                 
                                 <div class="flex flex-wrap items-center gap-2 mt-1">
-                                    <span id="cardBackZhuyin" class="editable-field text-xs text-amber-400 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)">ㄓˋ ㄏㄨㄟˋ ㄍㄨㄥ ㄉㄧㄢˋ</span>
+                                    <span id="cardBackZhuyin" class="editable-field text-xs sm:text-sm text-amber-400 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)">ㄓˋ ㄏㄨㄟˋ ㄍㄨㄥ ㄉㄧㄢˋ</span>
                                     <span class="text-zinc-600 text-xs">|</span>
                                     <span id="cardBackSource" class="editable-field text-xs text-zinc-400" contenteditable="false" onblur="saveField('source', this)">系統指引</span>
                                 </div>
@@ -374,36 +374,36 @@
                             </div>
                         </div>
 
-                        <!-- 3. 釋義與用途（完整展示） -->
+                        <!-- 3. 釋義與用途 -->
                         <div class="border-l-3 sm:border-l-4 border-teal-500 pl-3 py-0.5 shrink-0">
                             <span class="text-[10px] sm:text-xs text-teal-400 uppercase font-mono tracking-wider font-bold block">釋義與用途</span>
-                            <p id="cardBackMeaning" class="editable-field text-xs sm:text-sm font-medium text-zinc-200 tracking-wide mt-1 leading-relaxed" contenteditable="false" onblur="saveField('meaning', this)">
+                            <p id="cardBackMeaning" class="editable-field text-xs sm:text-base font-medium text-zinc-200 tracking-wide mt-1 leading-relaxed" contenteditable="false" onblur="saveField('meaning', this)">
                                 歡迎來到智慧宮殿字卡系統。請點選頂部「選擇課文」挑選您想溫習的單元。
                             </p>
                         </div>
 
-                        <!-- 4. 造句範例（完整展示） -->
-                        <div class="bg-zinc-900/40 border border-zinc-800/50 p-3 rounded-xl shrink-0">
+                        <!-- 4. 造句範例 -->
+                        <div class="bg-zinc-900/40 border border-zinc-800/50 p-3 sm:p-4 rounded-xl shrink-0">
                             <span class="text-[10px] sm:text-xs text-amber-500 font-bold tracking-widest block mb-1">【造句範例】</span>
-                            <p id="cardBackSentence" class="editable-field text-zinc-300 text-xs italic leading-relaxed tracking-wide" contenteditable="false" onblur="saveField('sentence', this)">
+                            <p id="cardBackSentence" class="editable-field text-zinc-300 text-xs sm:text-sm italic leading-relaxed tracking-wide" contenteditable="false" onblur="saveField('sentence', this)">
                                 溫故而知新，可以為師矣。
                             </p>
                         </div>
 
-                        <!-- 5. 歷史故事考據（完整展示，手機端往下滑動全覽） -->
-                        <div class="bg-zinc-900/60 border border-zinc-800/60 p-3 sm:p-4 rounded-xl relative">
+                        <!-- 5. 歷史故事考據 -->
+                        <div class="bg-zinc-900/60 border border-zinc-800/60 p-3.5 sm:p-4 rounded-xl relative">
                             <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2">
-                                <h4 class="text-xs text-amber-400 font-bold tracking-widest flex items-center gap-1.5">
+                                <h4 class="text-xs sm:text-sm text-amber-400 font-bold tracking-widest flex items-center gap-1.5">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>【古典歷史考據 · 故事這樣講】
                                 </h4>
                                 <div id="storyAudioBtnContainer" class="hidden">
-                                    <button id="playStoryAudioBtn" onclick="toggleStoryAudioPlay(event)" class="flex items-center gap-1 px-2 py-0.5 bg-teal-950/60 hover:bg-teal-900/80 active:scale-95 border border-teal-500/70 text-teal-300 text-[11px] rounded-lg transition">
+                                    <button id="playStoryAudioBtn" onclick="toggleStoryAudioPlay(event)" class="flex items-center gap-1 px-2.5 py-1 bg-teal-950/60 hover:bg-teal-900/80 active:scale-95 border border-teal-500/70 text-teal-300 text-xs rounded-lg transition">
                                         <i id="storyAudioIcon" class="fa-solid fa-play text-[10px]"></i>
                                         <span id="storyAudioBtnText" class="font-bold">播放課文</span>
                                     </button>
                                 </div>
                             </div>
-                            <p id="cardBackStory" class="editable-field text-zinc-300 text-xs leading-relaxed tracking-wide text-justify whitespace-pre-line" contenteditable="false" onblur="saveField('story', this)">
+                            <p id="cardBackStory" class="editable-field text-zinc-300 text-xs sm:text-sm leading-relaxed tracking-wide text-justify whitespace-pre-line" contenteditable="false" onblur="saveField('story', this)">
                                 典籍字卡系統結合 Google 試算表與艾賓浩斯記憶模型，協助您將古籍成語內化於心。
                             </p>
                         </div>
@@ -414,8 +414,8 @@
         </div>
     </main>
 
-    <!-- 底部導覽列 -->
-    <footer class="w-full max-w-2xl z-10 flex flex-col gap-2.5 mb-1 sm:mb-2">
+    <!-- 底部導覽列（緊接在卡片下方，無過多多餘空隙） -->
+    <footer class="w-full max-w-3xl z-10 flex flex-col gap-2.5 mb-2 sm:mb-4">
         <div class="flex justify-between gap-2.5">
             <button onclick="submitSrsReview(false)" class="flex-1 py-3 px-3 bg-[#16161c] border border-zinc-800 hover:border-amber-500/50 hover:bg-amber-950/15 text-amber-500 text-xs sm:text-sm font-bold tracking-wider rounded-2xl transition flex items-center justify-center gap-2 shadow-lg active:scale-95">
                 <i class="fa-solid fa-circle-question text-sm"></i>
