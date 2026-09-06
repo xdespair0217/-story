@@ -109,6 +109,10 @@
                     <label class="text-zinc-400 block mb-1">成語名稱：</label>
                     <input type="text" id="newCardTitleInput" value="新成語名稱" class="w-full bg-[#1c1c24] border border-zinc-700 rounded-xl px-3.5 py-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
                 </div>
+                <div>
+                    <label class="text-zinc-400 block mb-1">音訊連結 (music_url，可留空)：</label>
+                    <input type="text" id="newCardMusicInput" placeholder="https://.../audio.mp3" class="w-full bg-[#1c1c24] border border-zinc-700 rounded-xl px-3.5 py-2.5 text-zinc-100 focus:outline-none focus:border-amber-500 text-xs">
+                </div>
             </div>
             <div class="flex gap-3 justify-end mt-2">
                 <button onclick="closeNewCardModal()" class="px-5 py-2.5 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-sm rounded-xl transition-all">取消</button>
@@ -159,7 +163,7 @@
         </div>
     </div>
 
-    <!-- 頂部導覽列（升級至 max-w-3xl） -->
+    <!-- 頂部導覽列 -->
     <header class="w-full max-w-3xl z-10 flex flex-col gap-4 mt-2">
         <div class="relative bg-[#16161b] border border-zinc-800 rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-2.5 overflow-hidden mr-3">
@@ -234,7 +238,7 @@
         </div>
     </header>
 
-    <!-- 主體：3D 翻轉卡片（寬度升級至 max-w-3xl，高度自動延展並限制舒適上限） -->
+    <!-- 主體：3D 翻轉卡片 -->
     <main class="w-full max-w-3xl my-6 flex-1 flex flex-col items-center justify-center z-10">
         <div class="card-perspective w-full aspect-[4/4.3] sm:aspect-[4/3.8] md:aspect-[4/3.5] min-h-[520px] max-h-[660px] cursor-pointer" onclick="handleCardContainerClick(event)">
             <div id="cardInner" class="card-inner w-full h-full relative rounded-3xl shadow-2xl duration-700">
@@ -274,7 +278,7 @@
                 <div class="card-back absolute inset-0 w-full h-full rounded-3xl bg-[#131317] border border-zinc-800 flex flex-col p-6 sm:p-8 shadow-2xl emerald-glow overflow-hidden">
                     <div class="w-full h-full overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-5">
                         
-                        <!-- 1. 插圖區（加寬加適應，點擊放大燈箱） -->
+                        <!-- 1. 插圖區 -->
                         <div class="w-full aspect-[16/9.5] sm:aspect-[16/8.5] rounded-2xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950 shrink-0 group cursor-zoom-in" onclick="openImageLightbox(event)">
                             <img id="cardBackImage" src="" alt="精緻插圖" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#131317] via-transparent to-transparent pointer-events-none"></div>
@@ -309,12 +313,22 @@
                                         <input type="text" id="cardBackKeywordsInput" class="w-full bg-zinc-900 border border-amber-500/50 text-amber-300 text-xs px-3 py-1.5 rounded-lg" onblur="saveKeywordsInput(this)">
                                     </div>
                                 </div>
+
+                                <!-- 音訊網址欄位 (編輯模式下可修改，正常模式提示) -->
+                                <div id="musicUrlWrapper" class="mt-2.5 hidden">
+                                    <span class="text-[11px] text-zinc-500 block mb-1">自訂音訊連結 (J 欄 music_url)：</span>
+                                    <input type="text" id="cardBackMusicInput" placeholder="請貼上音訊網址 (如 https://.../audio.mp3)" class="w-full bg-zinc-900 border border-teal-500/40 text-teal-300 text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-teal-400" onblur="saveMusicUrlInput(this)">
+                                </div>
                             </div>
                             
-                            <button onclick="speakText(event)" class="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-teal-400 text-xs sm:text-sm rounded-xl transition-all shadow-md shrink-0">
-                                <i class="fa-solid fa-volume-high text-base"></i>
-                                <span class="font-bold">發音</span>
-                            </button>
+                            <!-- 音訊控制按鈕 -->
+                            <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                <button id="playAudioBtn" onclick="toggleAudioPlay(event)" class="flex items-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-teal-400 text-xs sm:text-sm rounded-xl transition-all shadow-md">
+                                    <i id="audioIcon" class="fa-solid fa-volume-high text-base"></i>
+                                    <span id="audioBtnText" class="font-bold">發音</span>
+                                </button>
+                                <span id="audioBadge" class="text-[10px] font-mono text-zinc-500">合成語音</span>
+                            </div>
                         </div>
 
                         <!-- 3. 釋義 -->
@@ -349,7 +363,7 @@
         </div>
     </main>
 
-    <!-- 底部導覽列（升級至 max-w-3xl） -->
+    <!-- 底部導覽列 -->
     <footer class="w-full max-w-3xl z-10 flex flex-col gap-4 mb-3">
         <div class="flex justify-between gap-4">
             <button onclick="markCard('review')" class="flex-1 py-3.5 px-5 bg-[#16161c] border border-zinc-800 hover:border-amber-500/50 hover:bg-amber-950/15 text-amber-500 text-sm sm:text-base font-bold tracking-wider rounded-2xl transition flex items-center justify-center gap-2.5 shadow-lg active:scale-95">
@@ -373,6 +387,9 @@
         </div>
     </footer>
 
+    <!-- 全域隱藏音訊播放器 -->
+    <audio id="globalAudioPlayer" class="hidden"></audio>
+
     <script>
         const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEtz5ifxuJjLi0xT9zJIu292hlQ068lgLp3vCLggyYxun0Z0Y5S8ZOwG8gTbBP8kW8KbvOxKvQhLTk/pub?gid=1690816227&single=true&output=csv";
         const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJWQh9F7rQ1UVKU-TiujGmLUWVUWGQ4lzRmJh3KisdJ1ypT7JWdX1UxCRzZZXvA5Du/exec"; 
@@ -386,6 +403,9 @@
         let currentStatusFilter = "all";
         let searchQuery = "";
         let isEditMode = false;
+
+        let isCustomAudioPlaying = false;
+        const globalAudioPlayer = document.getElementById("globalAudioPlayer");
 
         let progress = JSON.parse(localStorage.getItem("palace_sheets_progress_v2")) || { review: [], mastered: [] };
 
@@ -404,11 +424,39 @@
         const newCardCourseInput = document.getElementById("newCardCourseInput");
         const newCardIdInput = document.getElementById("newCardIdInput");
         const newCardTitleInput = document.getElementById("newCardTitleInput");
+        const newCardMusicInput = document.getElementById("newCardMusicInput");
         const newCardFilePreview = document.getElementById("newCardFilePreview");
 
         newCardIdInput.addEventListener("input", (e) => {
             newCardFilePreview.innerText = `${e.target.value.trim() || '--'}.jpg`;
         });
+
+        // 音訊播放完畢事件重置狀態
+        globalAudioPlayer.addEventListener("ended", () => {
+            resetAudioButtonState();
+        });
+
+        globalAudioPlayer.addEventListener("pause", () => {
+            resetAudioButtonState();
+        });
+
+        function resetAudioButtonState() {
+            isCustomAudioPlaying = false;
+            const audioBtnText = document.getElementById("audioBtnText");
+            const audioIcon = document.getElementById("audioIcon");
+            const playAudioBtn = document.getElementById("playAudioBtn");
+
+            const filtered = getActiveCards();
+            if (filtered.length > 0 && filtered[currentIndex].music_url) {
+                audioBtnText.innerText = "播放課文";
+                audioIcon.className = "fa-solid fa-play text-base";
+                playAudioBtn.className = "flex items-center gap-2 px-4 py-2.5 bg-teal-950/40 hover:bg-teal-900/60 active:scale-95 border border-teal-500/60 text-teal-300 text-xs sm:text-sm rounded-xl transition-all shadow-md";
+            } else {
+                audioBtnText.innerText = "發音";
+                audioIcon.className = "fa-solid fa-volume-high text-base";
+                playAudioBtn.className = "flex items-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-teal-400 text-xs sm:text-sm rounded-xl transition-all shadow-md";
+            }
+        }
 
         function showCustomModal(title, message, isConfirm, onConfirmCallback) {
             const modal = document.getElementById("customModal");
@@ -714,22 +762,26 @@
             const editableElements = document.querySelectorAll('.editable-field');
             const keywordsInputWrapper = document.getElementById("keywordsInputWrapper");
             const keywordsPillsContainer = document.getElementById("keywordsPillsContainer");
+            const musicUrlWrapper = document.getElementById("musicUrlWrapper");
 
             if (isEditMode) {
                 btn.className = "flex items-center gap-2 text-xs md:text-sm bg-amber-600 text-zinc-950 px-4 py-2 rounded-xl transition font-bold shadow-lg gold-glow";
                 btnText.innerText = "完成編輯";
                 keywordsInputWrapper.classList.remove("hidden");
                 keywordsPillsContainer.classList.add("hidden");
+                musicUrlWrapper.classList.remove("hidden");
                 
                 const filtered = getActiveCards();
                 if (filtered.length > 0) {
                     document.getElementById("cardBackKeywordsInput").value = filtered[currentIndex].keywords || "";
+                    document.getElementById("cardBackMusicInput").value = filtered[currentIndex].music_url || "";
                 }
             } else {
                 btn.className = "flex items-center gap-2 text-xs md:text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-4 py-2 rounded-xl transition font-bold shadow";
                 btnText.innerText = "開啟編輯";
                 keywordsInputWrapper.classList.add("hidden");
                 keywordsPillsContainer.classList.remove("hidden");
+                musicUrlWrapper.classList.add("hidden");
             }
 
             editableElements.forEach(el => { 
@@ -747,7 +799,7 @@
             const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
-            const newValue = element.innerText.trim();
+            const newValue = element.innerText ? element.innerText.trim() : (element.value ? element.value.trim() : "");
             card[field] = newValue;
 
             if (field === 'title') {
@@ -761,6 +813,8 @@
                 renderCard();
             } else if (field === 'course') {
                 document.getElementById("cardFrontCourseTag").innerText = newValue;
+            } else if (field === 'music_url') {
+                updateAudioBadgeAndButtons(newValue);
             }
 
             if (APPS_SCRIPT_WEBAPP_URL) {
@@ -787,6 +841,11 @@
             card.keywords = element.value.trim();
             renderKeywords(card);
             saveField('keywords', { innerText: card.keywords });
+        }
+
+        function saveMusicUrlInput(element) {
+            if (!isEditMode) return;
+            saveField('music_url', element);
         }
 
         function getNextGlobalDailyId() {
@@ -820,6 +879,7 @@
             newCardCourseInput.value = (selectedCourseFilter === "ALL") ? defaultCourseName : selectedCourseFilter;
             newCardIdInput.value = autoId;
             newCardTitleInput.value = "新成語名稱";
+            newCardMusicInput.value = "";
             newCardFilePreview.innerText = `${autoId}.jpg`;
             newCardModal.classList.remove("hidden");
         }
@@ -832,6 +892,7 @@
             const customCourse = newCardCourseInput.value.trim() || "預設成語單元";
             const customId = newCardIdInput.value.trim() || getNextGlobalDailyId();
             const customTitle = newCardTitleInput.value.trim() || "新成語名稱";
+            const customMusic = newCardMusicInput.value.trim() || "";
 
             const newCard = {
                 course: customCourse,
@@ -843,7 +904,7 @@
                 meaning: "請在此輸入成語的釋義與用法...",
                 sentence: "請在此輸入造句範例...",
                 story: "請在此輸入歷史故事與典故背景...",
-                music_url: "",
+                music_url: customMusic,
                 historyCount: "0"
             };
 
@@ -876,6 +937,9 @@
             showCustomModal("確認刪除", `您確定要永久刪除【${card.title} (${card.id})】嗎？\n雲端試算表中也將同步移除。`, true, async () => {
                 const deletedId = card.id;
                 
+                // 停止當前音訊
+                globalAudioPlayer.pause();
+
                 allMasterCards = allMasterCards.filter(c => c.id !== deletedId);
                 if (currentIndex >= getActiveCards().length) {
                     currentIndex = Math.max(0, getActiveCards().length - 1);
@@ -947,7 +1011,33 @@
             handleSearch();
         }
 
+        function updateAudioBadgeAndButtons(musicUrl) {
+            const audioBadge = document.getElementById("audioBadge");
+            const audioBtnText = document.getElementById("audioBtnText");
+            const audioIcon = document.getElementById("audioIcon");
+            const playAudioBtn = document.getElementById("playAudioBtn");
+
+            if (musicUrl && musicUrl.trim() !== "") {
+                audioBadge.innerText = "自訂音檔";
+                audioBadge.className = "text-[10px] font-mono text-teal-400 font-bold";
+                audioBtnText.innerText = "播放課文";
+                audioIcon.className = "fa-solid fa-play text-base";
+                playAudioBtn.className = "flex items-center gap-2 px-4 py-2.5 bg-teal-950/40 hover:bg-teal-900/60 active:scale-95 border border-teal-500/60 text-teal-300 text-xs sm:text-sm rounded-xl transition-all shadow-md";
+            } else {
+                audioBadge.innerText = "合成語音";
+                audioBadge.className = "text-[10px] font-mono text-zinc-500";
+                audioBtnText.innerText = "發音";
+                audioIcon.className = "fa-solid fa-volume-high text-base";
+                playAudioBtn.className = "flex items-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-teal-400 text-xs sm:text-sm rounded-xl transition-all shadow-md";
+            }
+        }
+
         function renderCard() {
+            // 切換卡片時立即暫停當前音訊播放
+            globalAudioPlayer.pause();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            isCustomAudioPlaying = false;
+
             const filtered = getActiveCards();
             
             if (filtered.length === 0) {
@@ -963,6 +1053,7 @@
                 document.getElementById("cardBackStory").innerText = "";
                 document.getElementById("cardProgressText").innerText = "0 / 0";
                 document.getElementById("cardProgressBar").style.width = "0%";
+                updateAudioBadgeAndButtons("");
                 return;
             }
 
@@ -991,8 +1082,10 @@
 
             if (isEditMode) {
                 document.getElementById("cardBackKeywordsInput").value = card.keywords || "";
+                document.getElementById("cardBackMusicInput").value = card.music_url || "";
             }
             renderKeywords(card);
+            updateAudioBadgeAndButtons(card.music_url);
 
             const total = filtered.length;
             document.getElementById("cardProgressText").innerText = `${currentIndex + 1} / ${total}`;
@@ -1109,13 +1202,49 @@
             renderCard();
         }
 
-        function speakText(event) {
-            event.stopPropagation();
-            const filtered = getActiveCards(); if (filtered.length === 0) return;
+        // 音訊播放核心邏輯（自訂音訊與合成語音雙軌）
+        function toggleAudioPlay(event) {
+            if (event) event.stopPropagation(); // 避免觸發翻轉卡片
+            const filtered = getActiveCards();
+            if (filtered.length === 0) return;
             const card = filtered[currentIndex];
+
+            const audioBtnText = document.getElementById("audioBtnText");
+            const audioIcon = document.getElementById("audioIcon");
+            const playAudioBtn = document.getElementById("playAudioBtn");
+
+            // 1. 若該成語有指定音訊網址 (music_url)
+            if (card.music_url && card.music_url.trim() !== "") {
+                if (isCustomAudioPlaying) {
+                    globalAudioPlayer.pause();
+                    isCustomAudioPlaying = false;
+                    audioBtnText.innerText = "播放課文";
+                    audioIcon.className = "fa-solid fa-play text-base";
+                } else {
+                    // 若音訊來源不同則重新載入
+                    if (globalAudioPlayer.src !== card.music_url) {
+                        globalAudioPlayer.src = card.music_url;
+                    }
+                    globalAudioPlayer.play().then(() => {
+                        isCustomAudioPlaying = true;
+                        audioBtnText.innerText = "暫停播放";
+                        audioIcon.className = "fa-solid fa-pause text-base";
+                    }).catch(err => {
+                        showCustomModal("音訊播放錯誤", "無法播放該連結音訊，請檢查網址或權限。\n將為您切換至瀏覽器發音。", false);
+                        speakNativeSynthesis(card.title);
+                    });
+                }
+                return;
+            }
+
+            // 2. 若無自訂音訊，走瀏覽器預設合成發音
+            speakNativeSynthesis(card.title);
+        }
+
+        function speakNativeSynthesis(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(card.title);
+                const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = "zh-TW"; 
                 utterance.rate = 0.8;    
                 window.speechSynthesis.speak(utterance);
