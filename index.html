@@ -71,7 +71,68 @@
         </div>
     </div>
 
-    <!-- 圖片全螢幕大圖燈箱 (Lightbox Modal，手機/電腦共用) -->
+    <!-- 系統架構說明書彈窗 (秘卷) -->
+    <div id="manualModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-[#141418] border border-zinc-800 w-full max-w-3xl max-h-[88vh] rounded-3xl p-6 sm:p-8 flex flex-col gap-5 shadow-2xl gold-glow relative">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-950/40 border border-amber-600/40 flex items-center justify-center text-amber-400">
+                        <i class="fa-solid fa-book-bookmark text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="serif-title text-xl text-zinc-100">宮殿秘卷 · 系統架構與邏輯手冊</h3>
+                        <p class="text-[11px] font-mono text-zinc-500">智慧宮殿成語學習系統 · 核心運行機制說明</p>
+                    </div>
+                </div>
+                <button onclick="toggleManualModal()" class="text-zinc-400 hover:text-zinc-100 p-2 text-xl transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6 text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                <div class="bg-zinc-900/50 border border-zinc-800/80 p-4 sm:p-5 rounded-2xl">
+                    <h4 class="text-amber-400 font-bold text-sm sm:text-base flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-database text-amber-500"></i> 一、資料庫與圖檔對應架構 (SSOT)
+                    </h4>
+                    <ul class="list-disc list-inside space-y-1.5 text-zinc-300 pl-1">
+                        <li><strong>Google 試算表主庫：</strong> 標準 11 欄結構，進入系統預設待命，點擊藏書閣即可加載任一課本。</li>
+                        <li><strong>A 欄【課文】：</strong> 分類單元標籤；B 欄【圖片編號 (ID)】為全域唯一鍵值。</li>
+                        <li><strong>圖檔對齊：</strong> 本地圖檔命名為完全一致的 <code class="text-teal-300 bg-zinc-800 px-1 py-0.5 rounded">${card.id}.jpg</code>，放在網頁同目錄即可零延遲讀取。</li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/50 border border-zinc-800/80 p-4 sm:p-5 rounded-2xl">
+                    <h4 class="text-teal-400 font-bold text-sm sm:text-base flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-brain text-teal-500"></i> 二、艾賓浩斯遺忘曲線與間隔重複 (SRS)
+                    </h4>
+                    <p class="mb-2 text-zinc-400">抗衡遺忘，動態演算法依據掌握度將複習時間延展（1、3、7、14、30、60 天）。</p>
+                    <ul class="list-disc list-inside space-y-1 text-zinc-300 pl-1">
+                        <li><strong>融會貫通 (內化)：</strong> 晉級並推遲複習日期；<strong>稍後思索 (重修)：</strong> 懲罰歸零並排入明日。</li>
+                        <li><strong>跨裝置雲端儲存：</strong> 進度即時存入試算表第 K 欄（<code class="text-teal-300">YYYY-MM-DD|Level</code>），換裝置無縫接軌。</li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/50 border border-zinc-800/80 p-4 sm:p-5 rounded-2xl">
+                    <h4 class="text-amber-400 font-bold text-sm sm:text-base flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-volume-high text-amber-500"></i> 三、雙軌音訊與大圖燈箱
+                    </h4>
+                    <ul class="list-disc list-inside space-y-1.5 text-zinc-300 pl-1">
+                        <li><strong>右上角常駐語音：</strong> 合成發音朗讀成語名稱。</li>
+                        <li><strong>故事區課文音訊：</strong> 僅當試算表 J 欄 <code class="text-amber-300">music_url</code> 有填寫網址時才浮現按鈕，支援隨時播放/暫停。</li>
+                        <li><strong>點圖全螢幕燈箱：</strong> 點擊插圖即進入全螢幕高清視野，阻斷事件冒泡不誤翻卡。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex justify-end border-t border-zinc-800 pt-3 shrink-0">
+                <button onclick="toggleManualModal()" class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-xl text-xs sm:text-sm transition">
+                    研讀完畢 · 關閉秘卷
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 圖片全螢幕大圖燈箱 (Lightbox Modal) -->
     <div id="imageLightboxModal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 cursor-zoom-out" onclick="closeImageLightbox()">
         <div class="relative max-w-5xl max-h-[92vh] flex flex-col items-center" onclick="event.stopPropagation()">
             <button onclick="closeImageLightbox()" class="absolute -top-11 right-0 text-zinc-400 hover:text-amber-400 text-base transition p-2 focus:outline-none flex items-center gap-2 font-sans font-bold">
@@ -86,7 +147,7 @@
         </div>
     </div>
 
-    <!-- 新增卡片自訂對話框（桌面端專用） -->
+    <!-- 新增卡片自訂對話框（桌面端） -->
     <div id="newCardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
         <div class="bg-[#16161c] border border-zinc-800 rounded-2xl w-full max-w-md p-7 shadow-2xl gold-glow flex flex-col gap-4">
             <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
@@ -169,21 +230,24 @@
             <div class="flex items-center gap-2 sm:gap-2.5 overflow-hidden mr-2 sm:mr-3">
                 <span class="text-xs sm:text-sm text-amber-500/80 font-semibold tracking-wider shrink-0">當前範疇：</span>
                 <button onclick="toggleCourseModal()" class="flex items-center gap-2 text-sm sm:text-base text-amber-400 hover:text-amber-300 font-bold tracking-wide transition truncate focus:outline-none group">
-                    <span id="currentCourseTitle" class="truncate">全部成語 (總庫)</span>
+                    <span id="currentCourseTitle" class="truncate">請開啟藏書閣挑選課文...</span>
                     <i class="fa-solid fa-chevron-down text-xs text-zinc-500 group-hover:text-amber-400 transition shrink-0"></i>
                 </button>
             </div>
             
-            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                <button onclick="reloadFromSheets()" title="從試算表重新抓取最新資料" class="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm bg-zinc-900 hover:bg-zinc-800 text-teal-400 border border-zinc-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition font-bold shadow">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <button onclick="toggleManualModal()" title="系統架構說明書" class="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-900/60 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition font-bold shadow hover:border-amber-500/50">
+                    <i class="fa-solid fa-book-bookmark text-amber-500"></i>
+                    <span>秘卷</span>
+                </button>
+                <button onclick="reloadFromSheets()" title="從試算表重新抓取最新資料" class="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm bg-zinc-900 hover:bg-zinc-800 text-teal-400 border border-zinc-700 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition font-bold shadow">
                     <i class="fa-solid fa-rotate"></i>
                     <span>同步</span>
                 </button>
-                <button onclick="toggleGalleryDrawer()" class="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-zinc-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition font-bold shadow">
+                <button onclick="toggleGalleryDrawer()" class="flex items-center gap-1.5 sm:gap-2 text-xs md:text-sm bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-zinc-700 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition font-bold shadow">
                     <i class="fa-solid fa-table-cells"></i>
                     <span>總覽</span>
                 </button>
-                <!-- 「開啟編輯」按鈕：手機端 (<768px) 自動隱藏，僅在桌面端顯現 -->
                 <button id="editModeBtn" onclick="toggleEditMode()" class="hidden md:inline-flex items-center gap-2 text-xs md:text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-4 py-2 rounded-xl transition font-bold shadow">
                     <i class="fa-solid fa-pen-to-square text-amber-500"></i>
                     <span id="editModeBtnText">開啟編輯</span>
@@ -195,8 +259,7 @@
         <div class="flex flex-col gap-2.5 sm:gap-3.5 bg-[#121215]/85 backdrop-blur border border-zinc-800/70 p-3.5 sm:p-5 rounded-2xl shadow-lg">
             <div class="flex justify-between items-center text-xs md:text-sm">
                 <span id="cardProgressText" class="text-zinc-400 font-mono font-medium">0 / 0</span>
-                <span id="syncStatus" class="text-[11px] sm:text-xs text-teal-400 font-mono">試算表待命</span>
-                <!-- 「新增卡片」與「刪除本張」：手機端自動隱藏，僅在電腦端顯現 -->
+                <span id="syncStatus" class="text-[11px] sm:text-xs text-teal-400 font-mono">宮殿待命</span>
                 <div class="hidden md:flex items-center gap-4">
                     <button onclick="openNewCardModal()" class="hover:text-amber-400 text-zinc-300 transition flex items-center gap-1.5 font-bold">
                         <i class="fa-solid fa-plus text-amber-500"></i> 新增卡片
@@ -247,28 +310,29 @@
                     <div class="absolute inset-0 opacity-[0.025] border-[16px] border-amber-600 m-3 sm:m-5 pointer-events-none rounded-2xl"></div>
                     
                     <div class="w-full flex justify-between items-center text-amber-500/40 text-xs tracking-widest font-mono">
-                        <span id="cardFrontIndex">NO. --</span>
+                        <span id="cardFrontIndex">智慧宮殿</span>
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <span id="cardFrontSrsBadge" class="px-2 sm:px-2.5 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-teal-400 text-[10px] sm:text-[11px] font-mono">Lv.0</span>
-                            <span id="cardFrontCourseTag" class="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-amber-950/40 text-amber-500/90 border border-amber-900/50 text-[11px] sm:text-xs font-sans">課文</span>
+                            <span id="cardFrontSrsBadge" class="px-2 sm:px-2.5 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-teal-400 text-[10px] sm:text-[11px] font-mono">待命</span>
+                            <span id="cardFrontCourseTag" class="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-amber-950/40 text-amber-500/90 border border-amber-900/50 text-[11px] sm:text-xs font-sans">典籍扉頁</span>
                         </div>
                     </div>
 
+                    <!-- 首頁狀態下的主體迎賓 -->
                     <div class="flex flex-col items-center gap-4 sm:gap-6 my-auto text-center">
-                        <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border border-amber-500/20 flex items-center justify-center mb-1 sm:mb-2 bg-amber-950/20 shadow-inner">
-                            <i class="fa-solid fa-scroll text-amber-500/80 text-xl sm:text-3xl"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-amber-500/20 flex items-center justify-center mb-1 sm:mb-2 bg-amber-950/20 shadow-inner">
+                            <i id="cardFrontCenterIcon" class="fa-solid fa-landmark text-amber-500/80 text-2xl sm:text-3xl"></i>
                         </div>
-                        <h2 id="cardFrontTitle" class="editable-field serif-title text-4xl sm:text-6xl md:text-7xl text-amber-100 leading-snug tracking-wider drop-shadow-md" contenteditable="false" onblur="saveField('title', this)">
-                            載入中...
+                        <h2 id="cardFrontTitle" class="editable-field serif-title text-4xl sm:text-5xl md:text-6xl text-amber-100 leading-snug tracking-wider drop-shadow-md" contenteditable="false" onblur="saveField('title', this)">
+                            智慧宮殿
                         </h2>
-                        <div id="cardFrontZhuyin" class="editable-field text-amber-400 text-sm sm:text-lg font-medium tracking-widest bg-amber-950/30 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full border border-amber-800/40 shadow" contenteditable="false" onblur="saveField('zhuyin', this)">
-                            ---
+                        <div id="cardFrontZhuyin" class="editable-field text-amber-400 text-sm sm:text-base font-medium tracking-widest bg-amber-950/30 px-4 sm:px-5 py-1.5 rounded-full border border-amber-800/40 shadow" contenteditable="false" onblur="saveField('zhuyin', this)">
+                            點擊上方「選擇課文」或點此開啟藏書閣
                         </div>
                     </div>
 
                     <div class="w-full text-center flex flex-col items-center gap-1.5 sm:gap-2">
                         <p id="cardFrontHint" class="text-zinc-400 text-xs sm:text-sm tracking-widest font-medium animate-pulse">
-                            點擊卡片翻轉 · 研讀古典考據
+                            請點選課本單元以開啟成語字卡
                         </p>
                         <div class="w-10 sm:w-12 h-[2px] bg-amber-600/50 mt-0.5"></div>
                     </div>
@@ -278,12 +342,12 @@
                 <div class="card-back absolute inset-0 w-full h-full rounded-3xl bg-[#131317] border border-zinc-800 flex flex-col p-5 sm:p-8 shadow-2xl emerald-glow overflow-hidden">
                     <div class="w-full h-full overflow-y-auto pr-1.5 sm:pr-2 custom-scrollbar flex flex-col gap-4 sm:gap-5">
                         
-                        <!-- 1. 插圖區（點擊放大燈箱） -->
+                        <!-- 1. 插圖區 -->
                         <div class="w-full aspect-[16/9.5] sm:aspect-[16/8.5] rounded-2xl overflow-hidden relative shadow-inner border border-zinc-800 bg-zinc-950 shrink-0 group cursor-zoom-in" onclick="openImageLightbox(event)">
-                            <img id="cardBackImage" src="" alt="精緻插圖" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img id="cardBackImage" src="https://placehold.co/800x450/141418/e4e4e7?text=%E6%99%BA%E6%85%A7%E5%AE%AE%E6%AE%BF%C2%B7%E9%96%8B%E5%95%9F%E8%97%8F%E6%9B%B8%E9%96%A3" alt="插圖" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#131317] via-transparent to-transparent pointer-events-none"></div>
                             <span id="imageTag" class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-mono tracking-widest bg-black/80 rounded-md text-teal-400 border border-teal-500/30 uppercase pointer-events-none">
-                                FILE: --
+                                FILE: PALACE
                             </span>
                             <div class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono bg-black/80 rounded-md text-zinc-300 border border-zinc-700/70 opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none flex items-center gap-1.5 shadow-lg">
                                 <i class="fa-solid fa-magnifying-glass-plus text-amber-400"></i> 檢視大圖
@@ -294,35 +358,34 @@
                         <div class="flex items-start justify-between border-b border-zinc-800/80 pb-3 sm:pb-4 shrink-0">
                             <div class="flex-1 mr-3 sm:mr-4">
                                 <div class="text-[11px] sm:text-xs text-amber-500 font-mono mb-1 flex items-center gap-2">
-                                    <span>ID：<span id="cardBackIdDisplay" class="editable-field bg-zinc-900 px-1.5 sm:px-2 py-0.5 rounded-md border border-amber-900/50" contenteditable="false" onblur="saveField('id', this)"></span></span>
+                                    <span>ID：<span id="cardBackIdDisplay" class="editable-field bg-zinc-900 px-1.5 sm:px-2 py-0.5 rounded-md border border-amber-900/50" contenteditable="false" onblur="saveField('id', this)">WELCOME</span></span>
                                     <span class="text-zinc-600">|</span>
-                                    <span class="truncate max-w-[120px] sm:max-w-none">課文：<span id="cardBackCourseDisplay" class="editable-field text-zinc-400" contenteditable="false" onblur="saveField('course', this)"></span></span>
+                                    <span class="truncate max-w-[120px] sm:max-w-none">課文：<span id="cardBackCourseDisplay" class="editable-field text-zinc-400" contenteditable="false" onblur="saveField('course', this)">首頁待命</span></span>
                                 </div>
-                                <h3 id="cardBackTitle" class="editable-field serif-title text-2xl sm:text-4xl text-zinc-100 tracking-wider" contenteditable="false" onblur="saveField('title', this)">載入中</h3>
+                                <h3 id="cardBackTitle" class="editable-field serif-title text-2xl sm:text-4xl text-zinc-100 tracking-wider" contenteditable="false" onblur="saveField('title', this)">智慧宮殿</h3>
                                 
                                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5 sm:mt-2">
-                                    <span id="cardBackZhuyin" class="editable-field text-xs sm:text-sm text-amber-400 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)"></span>
+                                    <span id="cardBackZhuyin" class="editable-field text-xs sm:text-sm text-amber-400 font-mono tracking-wide" contenteditable="false" onblur="saveField('zhuyin', this)">ㄓˋ ㄏㄨㄟˋ ㄍㄨㄥ ㄉㄧㄢˋ</span>
                                     <span class="text-zinc-600 text-xs sm:text-sm">|</span>
-                                    <span id="cardBackSource" class="editable-field text-xs sm:text-sm text-zinc-400 font-medium" contenteditable="false" onblur="saveField('source', this)"></span>
+                                    <span id="cardBackSource" class="editable-field text-xs sm:text-sm text-zinc-400 font-medium" contenteditable="false" onblur="saveField('source', this)">古典典籍</span>
                                 </div>
 
                                 <div id="cardBackKeywords" class="mt-2.5 sm:mt-3">
                                     <span class="text-[11px] sm:text-xs text-zinc-500 block mb-1">關鍵字：</span>
-                                    <div id="keywordsPillsContainer" class="flex flex-wrap gap-1.5 sm:gap-2 mb-1"></div>
-                                    <!-- 僅在電腦端進入編輯模式才呈現輸入框 -->
+                                    <div id="keywordsPillsContainer" class="flex flex-wrap gap-1.5 sm:gap-2 mb-1">
+                                        <span class="px-2.5 py-0.5 bg-amber-950/30 text-amber-400 text-xs rounded-lg border border-amber-900/50 font-medium"># 典籍藏書閣</span>
+                                    </div>
                                     <div id="keywordsInputWrapper" class="hidden">
                                         <input type="text" id="cardBackKeywordsInput" class="w-full bg-zinc-900 border border-amber-500/50 text-amber-300 text-xs px-3 py-1.5 rounded-lg" onblur="saveKeywordsInput(this)">
                                     </div>
                                 </div>
 
-                                <!-- 音訊網址欄位 (僅在電腦端進入編輯模式才顯現) -->
                                 <div id="musicUrlWrapper" class="mt-2.5 hidden">
                                     <span class="text-[11px] text-zinc-500 block mb-1">課文音訊連結 (J 欄 music_url)：</span>
-                                    <input type="text" id="cardBackMusicInput" placeholder="請貼上音訊網址 (如 https://.../story_audio.mp3)" class="w-full bg-zinc-900 border border-teal-500/40 text-teal-300 text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-teal-400" onblur="saveMusicUrlInput(this)">
+                                    <input type="text" id="cardBackMusicInput" placeholder="請貼上音訊網址" class="w-full bg-zinc-900 border border-teal-500/40 text-teal-300 text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-teal-400" onblur="saveMusicUrlInput(this)">
                                 </div>
                             </div>
                             
-                            <!-- 按鈕一：成語名稱朗讀發音按鈕（常駐） -->
                             <div class="flex flex-col items-end shrink-0">
                                 <button onclick="speakIdiomTitle(event)" title="朗讀成語名稱" class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-700 text-amber-400 text-xs sm:text-sm rounded-xl transition-all shadow-md">
                                     <i class="fa-solid fa-volume-high text-sm sm:text-base"></i>
@@ -336,7 +399,7 @@
                         <div class="border-l-4 border-teal-500 pl-3 sm:pl-4 py-1 shrink-0">
                             <span class="text-[11px] sm:text-xs text-teal-400 uppercase font-mono tracking-wider font-bold block">釋義與用途</span>
                             <p id="cardBackMeaning" class="editable-field text-xs sm:text-base font-medium text-zinc-200 tracking-wide mt-1 sm:mt-1.5 leading-relaxed" contenteditable="false" onblur="saveField('meaning', this)">
-                                讀取中...
+                                歡迎來到智慧宮殿字卡系統。本系統目前處於初始待命狀態，尚未載入特定課本。請點擊頂端「選擇課文」挑選您想溫習的單元。
                             </p>
                         </div>
 
@@ -344,7 +407,7 @@
                         <div class="bg-zinc-900/40 border border-zinc-800/50 px-4 py-3 sm:px-5 sm:py-4 rounded-2xl shrink-0">
                             <span class="text-[11px] sm:text-xs text-amber-500 font-bold tracking-widest block mb-1">【造句範例】</span>
                             <p id="cardBackSentence" class="editable-field text-zinc-300 text-xs sm:text-sm italic leading-relaxed tracking-wide" contenteditable="false" onblur="saveField('sentence', this)">
-                                讀取中...
+                                溫故而知新，可以為師矣。
                             </p>
                         </div>
 
@@ -354,8 +417,6 @@
                                 <h4 class="text-xs sm:text-sm text-amber-400 font-bold tracking-widest flex items-center gap-1.5 sm:gap-2">
                                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>【古典歷史考據 · 故事這樣講】
                                 </h4>
-                                
-                                <!-- 按鈕二：課文音訊播放按鈕 -->
                                 <div id="storyAudioBtnContainer" class="hidden">
                                     <button id="playStoryAudioBtn" onclick="toggleStoryAudioPlay(event)" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 bg-teal-950/60 hover:bg-teal-900/80 active:scale-95 border border-teal-500/70 text-teal-300 text-xs rounded-lg transition-all shadow">
                                         <i id="storyAudioIcon" class="fa-solid fa-play text-xs"></i>
@@ -364,7 +425,7 @@
                                 </div>
                             </div>
                             <p id="cardBackStory" class="editable-field text-zinc-300 text-xs sm:text-sm leading-relaxed tracking-wide text-justify whitespace-pre-line" contenteditable="false" onblur="saveField('story', this)">
-                                讀取中...
+                                系統已具備完整雲端同步與艾賓浩斯記憶模型。點擊上方「秘卷」可隨時檢閱操作與底層運作原理。
                             </p>
                         </div>
                     </div>
@@ -404,12 +465,11 @@
         const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEtz5ifxuJjLi0xT9zJIu292hlQ068lgLp3vCLggyYxun0Z0Y5S8ZOwG8gTbBP8kW8KbvOxKvQhLTk/pub?gid=1690816227&single=true&output=csv";
         const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJWQh9F7rQ1UVKU-TiujGmLUWVUWGQ4lzRmJh3KisdJ1ypT7JWdX1UxCRzZZXvA5Du/exec"; 
 
-        // 遺忘曲線間隔階梯（天數）：Lv.0->1天, Lv.1->3天, Lv.2->7天, Lv.3->14天, Lv.4->30天, Lv.5->60天
         const SRS_INTERVALS = [1, 3, 7, 14, 30, 60];
 
         let allMasterCards = [];
         let allCourseCategories = [];
-        let selectedCourseFilter = "ALL";
+        let selectedCourseFilter = "NONE"; // 初始為 NONE，代表停留在迎賓首頁
 
         let currentIndex = 0;
         let isFlipped = false;
@@ -430,6 +490,7 @@
         const galleryDrawer = document.getElementById("galleryDrawer");
         const galleryGridContainer = document.getElementById("galleryGridContainer");
         const syncStatus = document.getElementById("syncStatus");
+        const manualModal = document.getElementById("manualModal");
 
         const newCardModal = document.getElementById("newCardModal");
         const newCardCourseInput = document.getElementById("newCardCourseInput");
@@ -480,6 +541,15 @@
 
         function closeModal() {
             document.getElementById("customModal").classList.add("hidden");
+        }
+
+        function toggleManualModal() {
+            const isHidden = manualModal.classList.contains("hidden");
+            if (isHidden) {
+                manualModal.classList.remove("hidden");
+            } else {
+                manualModal.classList.add("hidden");
+            }
         }
 
         function openImageLightbox(event) {
@@ -544,8 +614,8 @@
                         <i class="fa-solid fa-globe"></i>
                     </span>
                     <div>
-                        <h4 class="text-xs sm:text-sm font-bold text-zinc-100 group-hover:text-amber-300 transition">★ 全部成語 (總庫檢索)</h4>
-                        <span class="text-[11px] sm:text-xs text-zinc-500">不限單元，全庫跨課溫習</span>
+                        <h4 class="text-xs sm:text-sm font-bold text-zinc-100 group-hover:text-amber-300 transition">★ 全部成語 (總庫跨課檢索)</h4>
+                        <span class="text-[11px] sm:text-xs text-zinc-500">不限單元，全庫成語統一溫習</span>
                     </div>
                 </div>
                 <span class="text-[11px] sm:text-xs font-mono text-teal-400 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800">
@@ -574,7 +644,7 @@
                 item.innerHTML = `
                     <div class="truncate pr-2">
                         <h4 class="text-xs sm:text-sm font-bold text-zinc-200 group-hover:text-amber-300 transition truncate">${cName}</h4>
-                        <span class="text-[11px] sm:text-xs text-zinc-500">單元課文</span>
+                        <span class="text-[11px] sm:text-xs text-zinc-500">單元課本</span>
                     </div>
                     <span class="text-[11px] sm:text-xs font-mono text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-zinc-900 border border-zinc-800 shrink-0">
                         ${count} 張
@@ -642,35 +712,35 @@
                 const csvText = await res.text();
                 const rows = parseCSV(csvText);
                 
-                if (rows.length <= 1) throw new Error("試算表內無資料");
-
                 allMasterCards = [];
                 const courseSet = new Set();
 
-                for (let i = 1; i < rows.length; i++) {
-                    const r = rows[i];
-                    if ((!r[0] || r[0].trim() === "") && (!r[1] || r[1].trim() === "")) continue;
+                if (rows.length > 1) {
+                    for (let i = 1; i < rows.length; i++) {
+                        const r = rows[i];
+                        if ((!r[0] || r[0].trim() === "") && (!r[1] || r[1].trim() === "")) continue;
 
-                    const courseTag = (r[0] && r[0].trim() !== "") ? r[0].trim() : "一般成語";
-                    courseSet.add(courseTag);
+                        const courseTag = (r[0] && r[0].trim() !== "") ? r[0].trim() : "一般成語";
+                        courseSet.add(courseTag);
 
-                    const historyVal = r[10] ? r[10].trim() : "0";
-                    const srs = parseSrsHistory(historyVal);
+                        const historyVal = r[10] ? r[10].trim() : "0";
+                        const srs = parseSrsHistory(historyVal);
 
-                    allMasterCards.push({
-                        course: courseTag,
-                        id: r[1] ? r[1].trim() : `20260906_${i}`,
-                        title: r[2] ? r[2].trim() : "",
-                        zhuyin: r[3] ? r[3].trim() : "",
-                        source: r[4] ? r[4].trim() : "",
-                        keywords: r[5] ? r[5].trim() : "",
-                        meaning: r[6] ? r[6].trim() : "",
-                        sentence: r[7] ? r[7].trim() : "",
-                        story: r[8] ? r[8].trim() : "",
-                        music_url: r[9] ? r[9].trim() : "",
-                        historyCount: historyVal,
-                        srs: srs
-                    });
+                        allMasterCards.push({
+                            course: courseTag,
+                            id: r[1] ? r[1].trim() : `20260906_${i}`,
+                            title: r[2] ? r[2].trim() : "",
+                            zhuyin: r[3] ? r[3].trim() : "",
+                            source: r[4] ? r[4].trim() : "",
+                            keywords: r[5] ? r[5].trim() : "",
+                            meaning: r[6] ? r[6].trim() : "",
+                            sentence: r[7] ? r[7].trim() : "",
+                            story: r[8] ? r[8].trim() : "",
+                            music_url: r[9] ? r[9].trim() : "",
+                            historyCount: historyVal,
+                            srs: srs
+                        });
+                    }
                 }
 
                 allCourseCategories = Array.from(courseSet).sort((a, b) => {
@@ -680,7 +750,14 @@
                     return a.localeCompare(b);
                 });
 
-                selectCourseFilter(selectedCourseFilter);
+                // 若原本未選課（首頁待命狀態），維持首頁待命，不主動載入第一課
+                if (selectedCourseFilter !== "NONE") {
+                    selectCourseFilter(selectedCourseFilter);
+                } else {
+                    updateFiltersCount();
+                    renderCard();
+                }
+
                 syncStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> 雲端就緒 (${allMasterCards.length} 筆)`;
             } catch (err) {
                 syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i> 連線失敗';
@@ -689,6 +766,10 @@
         }
 
         function toggleGalleryDrawer() {
+            if (selectedCourseFilter === "NONE") {
+                toggleCourseModal();
+                return;
+            }
             const isHidden = galleryDrawer.classList.contains("hidden");
             if (isHidden) {
                 renderGalleryGrid();
@@ -699,6 +780,11 @@
         }
 
         function bindJpgImage(imgElement, id, tagElement) {
+            if (!id || id === "WELCOME") {
+                imgElement.src = 'https://placehold.co/800x450/141418/e4e4e7?text=%E6%99%BA%E6%85%A7%E5%AE%AE%E6%AE%BF%C2%B7%E9%96%8B%E5%95%9F%E8%97%8F%E6%9B%B8%E9%96%A3';
+                if (tagElement) tagElement.innerText = `FILE: PALACE`;
+                return;
+            }
             const lowerSrc = `${id}.jpg`;
             const upperSrc = `${id}.JPG`;
             
@@ -765,10 +851,8 @@
             });
         }
 
-        // 僅桌面端觸發的編輯模式切換
         function toggleEditMode() {
-            // 防護：手機尺寸強制不啟用編輯
-            if (window.innerWidth < 768) return;
+            if (window.innerWidth < 768 || selectedCourseFilter === "NONE") return;
 
             isEditMode = !isEditMode;
             const btn = document.getElementById("editModeBtn");
@@ -804,12 +888,17 @@
         }
 
         function handleCardContainerClick(event) {
+            // 首頁待命狀態下，點擊卡片直接開啟藏書閣
+            if (selectedCourseFilter === "NONE") {
+                toggleCourseModal();
+                return;
+            }
             if (isEditMode) return;
             flipCard();
         }
 
         async function saveField(field, element) {
-            if (!isEditMode || window.innerWidth < 768) return;
+            if (!isEditMode || window.innerWidth < 768 || selectedCourseFilter === "NONE") return;
             const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
@@ -895,7 +984,7 @@
             const d = String(now.getDate()).padStart(2, '0');
             const defaultCourseName = `${y}${m}${d}_國文成語`;
 
-            newCardCourseInput.value = (selectedCourseFilter === "ALL") ? defaultCourseName : selectedCourseFilter;
+            newCardCourseInput.value = (selectedCourseFilter === "ALL" || selectedCourseFilter === "NONE") ? defaultCourseName : selectedCourseFilter;
             newCardIdInput.value = autoId;
             newCardTitleInput.value = "新成語名稱";
             newCardMusicInput.value = "";
@@ -935,6 +1024,8 @@
             }
 
             closeNewCardModal();
+            selectedCourseFilter = customCourse;
+            currentCourseTitle.innerText = `單元：${customCourse}`;
             currentIndex = 0;
             updateFiltersCount();
             renderCard();
@@ -944,7 +1035,7 @@
         }
 
         function deleteCurrentCard() {
-            if (window.innerWidth < 768) return;
+            if (window.innerWidth < 768 || selectedCourseFilter === "NONE") return;
             const activeCards = getActiveCards();
             if (activeCards.length === 0) {
                 showCustomModal("提示", "目前尚無可刪除的字卡。", false);
@@ -985,6 +1076,8 @@
         }
 
         function getActiveCards() {
+            if (selectedCourseFilter === "NONE") return [];
+
             let cards = [...allMasterCards];
 
             if (selectedCourseFilter !== "ALL") {
@@ -1013,6 +1106,7 @@
         }
 
         function handleSearch() {
+            if (selectedCourseFilter === "NONE") selectedCourseFilter = "ALL";
             searchQuery = searchBar.value;
             currentIndex = 0;
             clearSearchBtn.classList.toggle("hidden", searchQuery.length === 0);
@@ -1045,18 +1139,46 @@
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             resetStoryAudioButtonState();
 
+            // 狀態一：尚未選取課本（首頁迎賓扉頁）
+            if (selectedCourseFilter === "NONE") {
+                document.getElementById("currentCourseTitle").innerText = "請點此開啟藏書閣挑選課文...";
+                document.getElementById("cardFrontTitle").innerText = "智慧宮殿";
+                document.getElementById("cardFrontZhuyin").innerText = "請點選課本單元開啟學習";
+                document.getElementById("cardFrontIndex").innerText = "宮殿待命";
+                document.getElementById("cardFrontCourseTag").innerText = "藏書閣";
+                document.getElementById("cardFrontSrsBadge").innerText = "待命";
+                document.getElementById("cardFrontHint").innerText = "點擊卡片任何處 · 立即挑選課文單元";
+
+                bindJpgImage(document.getElementById("cardBackImage"), "WELCOME", document.getElementById("imageTag"));
+                document.getElementById("cardBackIdDisplay").innerText = "PALACE";
+                document.getElementById("cardBackCourseDisplay").innerText = "請先選課";
+                document.getElementById("cardBackTitle").innerText = "智慧宮殿";
+                document.getElementById("cardBackZhuyin").innerText = "ㄓˋ ㄏㄨㄟˋ ㄍㄨㄥ ㄉㄧㄢˋ";
+                document.getElementById("cardBackSource").innerText = "系統指引";
+                document.getElementById("cardBackMeaning").innerText = "目前為迎賓首頁狀態。請點選頂部「選擇課文」載入您想溫習的典籍單元。";
+                document.getElementById("cardBackSentence").innerText = "學而時習之，不亦說乎？";
+                document.getElementById("cardBackStory").innerText = "典籍字卡系統結合 Google 試算表與艾賓浩斯記憶模型，協助您將古籍成語內化於心。";
+                document.getElementById("cardProgressText").innerText = `庫存：${allMasterCards.length} 筆`;
+                document.getElementById("cardProgressBar").style.width = "0%";
+                updateStoryAudioButtonVisibility("");
+                return;
+            }
+
             const filtered = getActiveCards();
             
+            // 狀態二：已選課，但當前篩選下無卡片（已全數溫習完畢）
             if (filtered.length === 0) {
-                document.getElementById("cardFrontTitle").innerText = "恭喜完成！";
-                document.getElementById("cardFrontZhuyin").innerText = "今日無待溫習成語";
+                document.getElementById("cardFrontTitle").innerText = "今日無卡！";
+                document.getElementById("cardFrontZhuyin").innerText = "當前單元今日已全數內化";
                 document.getElementById("cardFrontIndex").innerText = "NO. --";
-                document.getElementById("cardFrontCourseTag").innerText = "宮殿完備";
+                document.getElementById("cardFrontCourseTag").innerText = "溫故完畢";
                 document.getElementById("cardFrontSrsBadge").innerText = "安座";
+                document.getElementById("cardFrontHint").innerText = "太棒了！今日複習已達成";
+
                 document.getElementById("cardBackTitle").innerText = "融會貫通";
                 document.getElementById("cardBackZhuyin").innerText = "";
                 document.getElementById("cardBackSource").innerText = "";
-                document.getElementById("cardBackMeaning").innerText = "當前篩選範疇內，今日無到期需要複習的成語。可切換至「全部成語」瀏覽查閱。";
+                document.getElementById("cardBackMeaning").innerText = "當前範疇內今日已無到期需要複習的成語。可切換至「全部」瀏覽查閱。";
                 document.getElementById("cardBackSentence").innerText = "";
                 document.getElementById("cardBackStory").innerText = "";
                 document.getElementById("cardProgressText").innerText = "0 / 0";
@@ -1065,6 +1187,7 @@
                 return;
             }
 
+            // 狀態三：正常呈現字卡
             if (currentIndex >= filtered.length) currentIndex = filtered.length - 1;
             if (currentIndex < 0) currentIndex = 0;
 
@@ -1076,6 +1199,7 @@
             document.getElementById("cardFrontIndex").innerText = `NO. ${card.id || '---'}`;
             document.getElementById("cardFrontCourseTag").innerText = card.course || "成語";
             document.getElementById("cardFrontSrsBadge").innerText = `Lv.${srs.level}`;
+            document.getElementById("cardFrontHint").innerText = "點擊卡片翻轉 · 研讀古典考據";
 
             const backImg = document.getElementById("cardBackImage");
             const tagEl = document.getElementById("imageTag");
@@ -1104,7 +1228,6 @@
             const nextIntervalDays = SRS_INTERVALS[Math.min(srs.level, SRS_INTERVALS.length - 1)];
             document.getElementById("masterBtnLabel").innerText = `已融會貫通 (+${nextIntervalDays}天)`;
 
-            // 非編輯模式下絕對不可編輯
             const editableElements = document.querySelectorAll('.editable-field');
             editableElements.forEach(el => {
                 el.contentEditable = (isEditMode && window.innerWidth >= 768) ? "true" : "false";
@@ -1148,6 +1271,7 @@
             if (e.key === "Escape") {
                 closeImageLightbox();
                 closeModal();
+                if (!manualModal.classList.contains("hidden")) toggleManualModal();
                 if (window.innerWidth >= 768) closeNewCardModal();
             } else if (e.key === "ArrowRight") nextCard();
             else if (e.key === "ArrowLeft") prevCard();
@@ -1155,6 +1279,10 @@
         });
 
         function submitSrsReview(isSuccess) {
+            if (selectedCourseFilter === "NONE") {
+                toggleCourseModal();
+                return;
+            }
             const filtered = getActiveCards(); 
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
@@ -1189,6 +1317,12 @@
         }
 
         function updateFiltersCount() {
+            if (selectedCourseFilter === "NONE") {
+                document.getElementById("count-due").innerText = "0";
+                document.getElementById("count-mastered").innerText = "0";
+                document.getElementById("count-all").innerText = "0";
+                return;
+            }
             const baseCards = (selectedCourseFilter === "ALL") 
                 ? allMasterCards 
                 : allMasterCards.filter(c => c.course === selectedCourseFilter);
@@ -1202,6 +1336,7 @@
         }
 
         function setFilter(filterType) {
+            if (selectedCourseFilter === "NONE") selectedCourseFilter = "ALL";
             currentStatusFilter = filterType; 
             currentIndex = 0; 
             isFlipped = false; 
@@ -1218,6 +1353,7 @@
 
         function speakIdiomTitle(event) {
             if (event) event.stopPropagation();
+            if (selectedCourseFilter === "NONE") return;
             const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
@@ -1233,6 +1369,7 @@
 
         function toggleStoryAudioPlay(event) {
             if (event) event.stopPropagation();
+            if (selectedCourseFilter === "NONE") return;
             const filtered = getActiveCards();
             if (filtered.length === 0) return;
             const card = filtered[currentIndex];
@@ -1262,13 +1399,13 @@
             }
         }
 
-        // 監聽螢幕旋轉或視窗拉動，確保在手機上永遠關閉 contentEditable
         window.addEventListener('resize', () => {
             if (window.innerWidth < 768 && isEditMode) {
                 toggleEditMode();
             }
         });
 
+        // 啟動時同步試算表結構，並保持在迎賓扉頁
         reloadFromSheets();
     </script>
 </body>
